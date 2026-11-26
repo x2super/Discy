@@ -190,40 +190,39 @@ client also offers a server without the permission when it has a vanity
 URL, and sends that instead; Yapfast doesn't keep servers' vanity codes, so it
 leaves those out.
 
-## Joining by invite
+## Creating and joining a server
 
-The "+" at the foot of the server rail opens Join a Server, which takes an
-invite link or a bare code, a server's vanity code too, as Discord's dialog
-does: `discord.gg/{code}`, or `/invite/{code}` on discord.com, discordapp.com,
-canary and ptb, with any query left off; otherwise the last part after a `/`
-(`invite.rs`). Clicking an invite link in a message opens the same dialog
-without the field, even when the link's text says something else, instead
-of the browser. Either looks the invite up first and shows its server,
-icon, and how many members it has and how many are online, or the channel
-when it has fewer than five members and none online, as Discord's invite
-card does; nothing joins until the Join in Browser click.
+The "+" at the foot of the server rail opens Add a Server, letting you
+pick between **Create a Server** and **Join a Server**:
 
-- `GET /invites/{code}?with_counts=true&with_expiration=true&with_permissions=true`,
-  as Discord's client resolves an invite, with `&inputValue=` and what was
-  typed into the dialog when it was. An invite that isn't to a server's
-  channel, such as a friend invite, is refused.
+- **Create a Server**: asks for a 2–100 character name and sends
+  `POST /guilds` (`application/join.rs`, `api.rs`). If Discord asks for a
+  captcha, Discy opens the solver page in the browser and retries once
+  solved; once created, Discy navigates to the server when its
+  `GUILD_CREATE` arrives.
+- **Join a Server**: takes an invite link or bare code, including a
+  server's vanity code, as Discord's dialog does: `discord.gg/{code}`, or
+  `/invite/{code}` on discord.com, discordapp.com, canary and ptb, with
+  any query left off; otherwise the last part after a `/` (`invite.rs`).
+  Submitting joins directly in-app (`JoinInvite` resolves
+  `GET /invites/{code}?with_counts=true&with_expiration=true&with_permissions=true`
+  with `&inputValue=` and immediately sends `POST /invites/{code}` with
+  `{"session_id": ...}` and Discord's `X-Context-Properties`, without a
+  separate Find Invite step). An invite to a server the account is in
+  opens the server immediately.
+- **Clicked invite links**: clicking an invite link in a message opens
+  Join a Server directly without the text field, resolves the preview card
+  with its server, icon, and member/online counts (or channel if under five
+  members and none online), and offers Join Server (`POST /invites/{code}`)
+  or Open Server if already a member.
 
-An invite to a server the account is in opens the server instead of
-joining, at once for a link; the dialog says so and its button opens it.
-For any other server, Join in Browser closes the dialog and opens the
-invite's page, `https://discord.gg/{code}`, where Discord's web app joins
-it, with its captcha and the server's form for new members. Accounts were
-signed out of every device after joining in Yapfast, so until Yapfast's
-join request matches Discord's client, Yapfast sends none. Once joined,
-the server's GUILD_CREATE lists it, and Yapfast opens the invite's channel
-when it does; a voice channel's invite opens the channel without joining
-the call. An invalid or expired invite (10006, 50020) shows Discord's
-refusal in the dialog.
-
-The in-app join stays in the code, unreached: `POST /invites/{code}` with
-`{"session_id": ...}` and Discord's `X-Context-Properties`, its captcha,
-its refusals, and a server form (`show_verification_form`) sent to
-Discord's web app (`application/join.rs`, `invite.rs`).
+If Discord asks for a captcha during join or create, Discy opens the
+captcha page in the browser; if a joined server asks new members to
+complete a form (`show_verification_form`), Discy keeps the dialog open
+to send that step to Discord's web app (`Open in browser`). Once joined,
+the server's `GUILD_CREATE` lists it, and Discy opens the invite's
+channel (or voice channel without joining the call). An invalid or
+expired invite (`10006`, `50020`) shows Discord's refusal in the dialog.
 
 ## Event links
 

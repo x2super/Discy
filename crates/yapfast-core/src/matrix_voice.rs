@@ -235,7 +235,7 @@ fn call_options(room: &Room) -> Result<CallOptions> {
     });
     if let Some(url) = &fallback {
         let url = url::Url::parse(url)
-            .context("Invalid calling-service URL. Check Yapfast's configuration.")?;
+            .context("Invalid calling-service URL. Check Discy's configuration.")?;
         let local = matches!(url.host_str(), Some("localhost" | "127.0.0.1" | "[::1]"));
         ensure!(
             url.scheme() == "https" || (url.scheme() == "http" && local),
@@ -654,7 +654,7 @@ async fn device_problem(
     match client.encryption().get_device(&user, device.into()).await {
         Ok(Some(device)) if device.is_cross_signed_by_owner() => None,
         Ok(Some(_)) => {
-            Some("Unverified device. It can't receive your audio key, and Yapfast refuses its key.")
+            Some("Unverified device. It can't receive your audio key, and Discy refuses its key.")
         }
         _ => Some("Unknown device; your audio key may not reach it."),
     }
@@ -796,7 +796,7 @@ async fn set_muted(
             track.unmute();
         } else {
             let track =
-                LocalAudioTrack::create_audio_track("Yapfast microphone", audio.rtc_source());
+                LocalAudioTrack::create_audio_track("Discy microphone", audio.rtc_source());
             let result = tokio::time::timeout(
                 Duration::from_secs(10),
                 call.publish_audio_track(

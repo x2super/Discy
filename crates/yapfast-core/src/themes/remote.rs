@@ -502,7 +502,7 @@ pub fn read_catalog(bytes: &[u8]) -> Result<Catalog, String> {
         .map_err(|error| format!("The theme catalog couldn't be read: {error}"))?;
     if file.version == 0 || file.version > CATALOG_VERSION {
         return Err(format!(
-            "The theme catalog is version {}, and this Yapfast reads version {CATALOG_VERSION}; an update may read it",
+            "The theme catalog is version {}, and this Discy reads version {CATALOG_VERSION}; an update may read it",
             file.version
         ));
     }

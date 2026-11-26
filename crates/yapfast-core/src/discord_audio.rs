@@ -468,7 +468,7 @@ impl GateMeter {
                         crate::audio_io::raise_thread_priority("mic-test");
                         let mut output = crate::audio_io::Output::<i16>::open(
                             speaker.as_deref(),
-                            "Yapfast microphone test",
+                            "Discy microphone test",
                             SAMPLE_RATE,
                             1,
                             Some(Duration::from_millis(30)),

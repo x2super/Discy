@@ -31,7 +31,7 @@ impl<'a> Page<'a> {
                 Some(pref(Pref::Notifications(!on))),
             )
             .description(format!(
-                "For new messages while Yapfast isn't in front. {rules} which: usually DMs and mentions. Clicking one opens the conversation."
+                "For new messages while Discy isn't in front. {rules} which: usually DMs and mentions. Clicking one opens the conversation."
             ))
             .view(self.cx.look),
             switch(
@@ -43,7 +43,7 @@ impl<'a> Page<'a> {
             .view(self.cx.look),
             self.flip(
                 "Flash the taskbar",
-                "For a message that notifies while Yapfast isn't in front. The window's title counts mentions and DMs waiting either way.",
+                "For a message that notifies while Discy isn't in front. The window's title counts mentions and DMs waiting either way.",
                 prefs.flash_taskbar.unwrap_or(true),
                 Pref::FlashTaskbar,
             ),

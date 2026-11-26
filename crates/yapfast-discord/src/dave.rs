@@ -278,7 +278,7 @@ impl Dave {
                             .as_ref()
                             .is_some_and(|session| session.status() != SessionStatus::ACTIVE) =>
                     {
-                        tracing::info!(?error, "DAVE proposals for a group Yapfast isn't in yet");
+                        tracing::info!(?error, "DAVE proposals for a group Discy isn't in yet");
                     }
                     Some(Err(error)) => {
                         tracing::warn!(?error, "could not process MLS proposals");
@@ -301,7 +301,7 @@ impl Dave {
                 }) {
                     tracing::info!(
                         transition_id = event.transition_id,
-                        "a DAVE commit before Yapfast is in the group; waiting for its welcome"
+                        "a DAVE commit before Discy is in the group; waiting for its welcome"
                     );
                     return vec![];
                 }

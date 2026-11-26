@@ -44,7 +44,7 @@ impl Transport {
                 XChaCha20Poly1305::new_from_slice(key)
                     .map_err(|_| anyhow!("the stream key isn't 32 bytes"))?,
             ),
-            _ => bail!("Discord chose an encryption mode Yapfast doesn't know: {mode}"),
+            _ => bail!("Discord chose an encryption mode Discy doesn't know: {mode}"),
         };
         Ok(Self {
             cipher,

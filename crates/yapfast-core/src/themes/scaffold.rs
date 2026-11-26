@@ -94,7 +94,7 @@ pub fn manifest(new: &NewTheme) -> Result<String, String> {
     let quote = |text: &str| Value::String(text.to_owned()).to_string();
     let description = match &new.start {
         Some(start) => format!("{name}, from {}'s colours.", start.from),
-        None => format!("{name}, a theme for Yapfast."),
+        None => format!("{name}, a theme for Discy."),
     };
     // A checkout that turns line ends into CRLF (Git's `core.autocrlf` on
     // Windows) builds the template in with them; a new theme is written with
@@ -199,7 +199,7 @@ pub fn create(folder: &Path, new: &NewTheme) -> Result<Vec<PathBuf>, String> {
 pub fn next_steps(folder: &Path, written: &[PathBuf], report: &check::Report) -> String {
     let shown = folder.display();
     let mut out = format!(
-        "Made {shown} ({} files) from Yapfast's template.\n",
+        "Made {shown} ({} files) from Discy's template.\n",
         written.len()
     );
     out.push_str(&report.text());

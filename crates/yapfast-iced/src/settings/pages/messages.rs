@@ -100,7 +100,7 @@ impl<'a> Page<'a> {
                 form::heading(theme, "PLAY GIFS, EMOJI AND STICKERS"),
                 choices(
                     theme,
-                    &["While Yapfast is focused", "Always", "Never"],
+                    &["While Discy is focused", "Always", "Never"],
                     animate,
                     |index| pref(Pref::Animate(index)),
                 ),

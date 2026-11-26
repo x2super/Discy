@@ -1358,7 +1358,7 @@ impl Discord {
         files: Vec<Vec<u8>>,
     ) -> Result<bool> {
         if files.len() != run.files.len() {
-            bail!("Yapfast lost a file of this command. Choose it again.");
+            bail!("Discy lost a file of this command. Choose it again.");
         }
         let files = run.files.iter().cloned().zip(files).collect();
         self.interact_with_files(&interactions::Interaction::Command(run), files)
@@ -1378,7 +1378,7 @@ impl Discord {
             bail!("Only a form carries files.");
         };
         if files.len() != names.len() {
-            bail!("Yapfast lost a file of this form. Choose it again.");
+            bail!("Discy lost a file of this form. Choose it again.");
         }
         let files = names.iter().cloned().zip(files).collect();
         self.interact_with_files(form, files).await
@@ -1442,7 +1442,7 @@ impl Discord {
         let (reply, answer) = oneshot::channel();
         self.requests
             .send(Request::Session(reply))
-            .map_err(|_| anyhow!("Discord isn't connected. Restart Yapfast and try again."))?;
+            .map_err(|_| anyhow!("Discord isn't connected. Restart Discy and try again."))?;
         answer
             .await
             .ok()
@@ -1617,7 +1617,7 @@ impl Discord {
         let channel = match (in_server, channel) {
             (Some(_), _) => "",
             (None, Some(channel)) => channel,
-            (None, None) => bail!("Yapfast can't tell which DM to search."),
+            (None, None) => bail!("Discy can't tell which DM to search."),
         };
         let params = self.search_query(guild, text).await.params();
         if params.is_empty() {
@@ -1836,7 +1836,7 @@ impl Discord {
                 .iter()
                 .find(|server| server.id == guild)
                 .and_then(|server| server.channel(forum))
-                .ok_or_else(|| anyhow!("Yapfast doesn't know that forum."))?;
+                .ok_or_else(|| anyhow!("Discy doesn't know that forum."))?;
             match forum.archive_after {
                 0 => DEFAULT_ARCHIVE,
                 minutes => minutes,
@@ -2520,7 +2520,7 @@ impl Discord {
         self.ask_members(guild, std::iter::once(user)).await;
         let held = self.roles(guild, user);
         if !held.iter().any(|known| known == role) {
-            bail!("Yapfast doesn't know that member's roles yet. Try again.");
+            bail!("Discy doesn't know that member's roles yet. Try again.");
         }
         let kept: Vec<String> = held.iter().filter(|held| *held != role).cloned().collect();
         self.api.set_member_roles(guild, user, &kept).await?;
@@ -3335,6 +3335,26 @@ impl Discord {
         Ok(())
     }
 
+    /// Creates a Discord server named `name`, solving any captcha Discord asks
+    /// for first, and returns the new server's Discord id.
+    pub async fn create_guild(&self, name: &str, captcha: impl FnMut(&str)) -> Result<String> {
+        let api = &self.api;
+        let answer = crate::captcha::solving(
+            |solved| async move {
+                let solved = solved
+                    .as_ref()
+                    .map(|(captcha, solution)| (captcha, solution.as_str()));
+                api.create_guild(name, solved).await
+            },
+            captcha,
+        )
+        .await?;
+        answer["id"]
+            .as_str()
+            .map(str::to_owned)
+            .context("Discord didn't return the new server.")
+    }
+
     /// What an invite shows before joining by it, by its code; see
     /// [`Api::resolve_invite`]. An invite that isn't to a server, which
     /// Yapfast doesn't join, is refused.
@@ -3356,7 +3376,7 @@ impl Discord {
         let (reply, answer) = oneshot::channel();
         self.requests
             .send(Request::Session(reply))
-            .map_err(|_| anyhow!("Discord isn't connected. Restart Yapfast and try again."))?;
+            .map_err(|_| anyhow!("Discord isn't connected. Restart Discy and try again."))?;
         let session = answer
             .await
             .ok()
@@ -3937,7 +3957,7 @@ impl Discord {
                 .iter()
                 .find(|server| server.id == guild)
                 .and_then(|server| server.channel(channel))
-                .ok_or_else(|| anyhow!("Yapfast doesn't know that channel."))?;
+                .ok_or_else(|| anyhow!("Discy doesn't know that channel."))?;
             (parent.announcement, parent.archive_after)
         };
         let kind = match (private, announcement) {
@@ -4351,7 +4371,7 @@ impl Discord {
                 channel: channel.into(),
                 reply,
             })
-            .map_err(|_| anyhow!("Discord isn't connected. Restart Yapfast and try again."))?;
+            .map_err(|_| anyhow!("Discord isn't connected. Restart Discy and try again."))?;
         answer
             .await
             .map_err(|_| anyhow!("Discord disconnected while joining voice."))?
@@ -4385,7 +4405,7 @@ impl Discord {
                 channel: channel.into(),
                 reply,
             })
-            .map_err(|_| anyhow!("Discord isn't connected. Restart Yapfast and try again."))?;
+            .map_err(|_| anyhow!("Discord isn't connected. Restart Discy and try again."))?;
         answer
             .await
             .map_err(|_| anyhow!("Discord disconnected while starting the stream."))?
@@ -4399,7 +4419,7 @@ impl Discord {
                 stream_key: stream_key.into(),
                 reply,
             })
-            .map_err(|_| anyhow!("Discord isn't connected. Restart Yapfast and try again."))?;
+            .map_err(|_| anyhow!("Discord isn't connected. Restart Discy and try again."))?;
         answer
             .await
             .map_err(|_| anyhow!("Discord disconnected while opening the stream."))?

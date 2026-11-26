@@ -444,7 +444,7 @@ impl Files {
 
 /// A sound's file, MP3 or Ogg, as 48 kHz interleaved stereo.
 pub(crate) fn decode(data: &[u8]) -> Result<Vec<i16>> {
-    let mut file = Video::open_sound(Cursor::new(data)).context("not a sound Yapfast can play")?;
+    let mut file = Video::open_sound(Cursor::new(data)).context("not a sound Discy can play")?;
     let (rate, channels) = file.sound.context("the file has no sound")?;
     let mut resampler = Resampler::new(rate, channels);
     let longest = LONGEST_SECONDS * crate::audio_io::RATE as usize * 2;

@@ -274,7 +274,7 @@ pub(super) fn input_level<'a>(ctx: crate::ctx::Ctx<'a>) -> Element<'a, Message> 
     let note = if !yapfast_core::meter::AVAILABLE {
         Some("The level meter isn't available on this system yet.")
     } else if ctx.call.meter.as_ref().is_some_and(InputMeter::failed) {
-        Some("Yapfast can't read this microphone. Check that it's connected, or choose another.")
+        Some("Discy can't read this microphone. Check that it's connected, or choose another.")
     } else if muted {
         Some("Muted. Nothing you say is sent.")
     } else {

@@ -122,7 +122,7 @@ impl Decoder {
             ),
             // Not in DECODES, so Discord sends this viewer H264.
             #[cfg(not(hevcdec))]
-            Codec::H265 => bail!("this build of Yapfast can't decode H265"),
+            Codec::H265 => bail!("this build of Discy can't decode H265"),
             Codec::Av1 => (
                 // SAFETY: plain values.
                 unsafe { yapfast_av1_new(threads) },

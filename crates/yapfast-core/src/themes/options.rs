@@ -294,7 +294,7 @@ pub fn sounds_option() -> ThemeOption {
     ThemeOption {
         id: SOUNDS.to_owned(),
         label: "Theme sounds".to_owned(),
-        description: "How loud the theme's own sounds play; all the way down is off. Yapfast's own sounds keep their volume."
+        description: "How loud the theme's own sounds play; all the way down is off. Discy's own sounds keep their volume."
             .to_owned(),
         kind: Kind::Slider {
             default: 100.0,

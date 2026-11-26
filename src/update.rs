@@ -447,7 +447,7 @@ pub fn source() -> Source {
 pub(crate) fn client() -> Result<reqwest::Client, String> {
     let _ = rustls::crypto::aws_lc_rs::default_provider().install_default();
     reqwest::Client::builder()
-        .user_agent(concat!("Yapfast/", env!("CARGO_PKG_VERSION")))
+        .user_agent(concat!("Discy/", env!("CARGO_PKG_VERSION")))
         .https_only(true)
         .connect_timeout(std::time::Duration::from_secs(20))
         .read_timeout(std::time::Duration::from_secs(60))

@@ -136,7 +136,7 @@ impl<'a> Page<'a> {
             form::heading(theme, "FONT"),
             form::note(
                 theme,
-                "Draw all of Yapfast in your own font. Choose its TTF, OTF, TTC or WOFF files, every weight and italic you have; WOFF2 isn't supported. Code and emoji keep their fonts.",
+                "Draw all of Discy in your own font. Choose its TTF, OTF, TTC or WOFF files, every weight and italic you have; WOFF2 isn't supported. Code and emoji keep their fonts.",
             ),
         ];
         let any = !entries.is_empty();

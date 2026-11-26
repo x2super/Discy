@@ -1012,7 +1012,7 @@ pub(crate) async fn call(
                                 }
                                 Ok(Err(error)) => {
                                     tracing::warn!(error = format!("{error:#}"), "could not follow the call to its new voice server");
-                                    bail!("Discord moved the call to another voice server, and Yapfast couldn't connect to it. Join again.");
+                                    bail!("Discord moved the call to another voice server, and Discy couldn't connect to it. Join again.");
                                 }
                                 Err(_) => bail!("Discord moved the call to another voice server, which took too long to answer. Join again."),
                             }

@@ -317,7 +317,7 @@ fn the_editors_tabs_say_what_the_profile_will_show() {
     let _ = app.update(edit(EditorEvent::Tab(crate::profile::look::Tab::Board)));
     for words in [
         "Nothing on your board yet.",
-        "Adding more from Yapfast is coming soon.",
+        "Adding more from Discy is coming soon.",
     ] {
         assert!(shows(&app, words), "{words}");
     }

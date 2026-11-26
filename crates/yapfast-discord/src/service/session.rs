@@ -121,7 +121,7 @@ pub(super) async fn run(
             Some("Discord refused the saved login. Link your Discord account again.")
         } else if error.downcast_ref::<TooManyIdentifies>().is_some() {
             Some(
-                "Discord keeps ending the connection, so Yapfast stopped reconnecting. Restart Yapfast to try again.",
+                "Discord keeps ending the connection, so Discy stopped reconnecting. Restart Discy to try again.",
             )
         } else {
             None

@@ -10,12 +10,12 @@
 //! it.
 
 use iced::{
-    Alignment, Element, Length, Task,
+    Alignment, Border, Element, Length, Task,
     keyboard::key,
-    widget::{Id, button, container, operation, row, text},
+    widget::{Id, button, column, container, operation, row, text},
 };
 use yapfast_core::{
-    application::{Action, AppState, ChannelAsk, INVITE_AGES, INVITE_USES},
+    application::{Action, AppState, ChannelAsk, INVITE_AGES, INVITE_USES, JoinStep},
     chat::{ChannelKind, ChannelSettings},
 };
 
@@ -24,17 +24,19 @@ use crate::{
     controls::{self, Kind, action},
     ctx::{Ctx, Cx, Focus, Request},
     dialog::buttons,
+    fonts::BOLD,
     form,
+    icons::Icon,
     style::rounded,
 };
 
-/// The dialogs' widths: the invite's and the channel's, and Join a
-/// Server's.
+/// The dialogs' widths: the invite's and the channel's, and Add a Server's.
 const WIDE: f32 = 460.0;
 const NARROW: f32 = 440.0;
 /// The invite link's box.
 const LINK: f32 = 44.0;
 /// The fields' ids.
+const CREATE_FIELD: &str = "create-server-name";
 const JOIN_FIELD: &str = "join-invite";
 const CHANNEL_FIELD: &str = "channel-name";
 
@@ -51,8 +53,8 @@ pub struct Dialogs {
     /// The invite dialog's next link (each an index into its list), and the
     /// link last copied, while it's open.
     invite: Option<InviteChoice>,
-    /// Join a Server's field, while it's open.
-    join: Option<String>,
+    /// What's typed in Add / Create / Join a Server, while it's open.
+    join: Option<JoinDraft>,
     /// The channel dialog's name and kind, while it's open.
     channel: Option<ChannelDraft>,
     /// Whether the leave dialog showed at the last sync.
@@ -63,6 +65,12 @@ struct InviteChoice {
     age: usize,
     uses: usize,
     copied: Option<String>,
+}
+
+struct JoinDraft {
+    step: JoinStep,
+    link: String,
+    server_name: String,
 }
 
 struct ChannelDraft {
@@ -77,9 +85,14 @@ pub enum Event {
     Copy(String),
     Remake,
     CloseInvite,
+    ChooseCreate,
+    ChooseJoin,
+    BackToChoose,
+    CreateName(String),
+    CreateServer,
     JoinLink(String),
-    Find,
-    /// Join Server's main button: find the invite, join, or open the form.
+    JoinDirect,
+    /// Join Server's confirmation button on a clicked invite link or form.
     Confirm,
     OpenCaptcha,
     CloseJoin,
@@ -97,6 +110,17 @@ pub enum Event {
 
 fn message(event: Event) -> Message {
     Message::ServerDialog(event)
+}
+
+fn join_focus(step: JoinStep, from_link: bool) -> &'static str {
+    if from_link || step == JoinStep::Choose {
+        return NOBODY;
+    }
+    match step {
+        JoinStep::Choose => NOBODY,
+        JoinStep::Create => CREATE_FIELD,
+        JoinStep::Join => JOIN_FIELD,
+    }
 }
 
 /// Whether one of these dialogs is open, which takes the keys.
@@ -143,11 +167,21 @@ impl Dialogs {
             None => local.invite = None,
         }
         match &state.join {
-            Some(join) if local.join.is_none() => {
-                local.join = Some(String::new());
-                focus = Some(if join.from_link { NOBODY } else { JOIN_FIELD });
-            }
-            Some(_) => {}
+            Some(join) => match &mut local.join {
+                None => {
+                    local.join = Some(JoinDraft {
+                        step: join.step,
+                        link: String::new(),
+                        server_name: String::new(),
+                    });
+                    focus = Some(join_focus(join.step, join.from_link));
+                }
+                Some(draft) if draft.step != join.step => {
+                    draft.step = join.step;
+                    focus = Some(join_focus(join.step, join.from_link));
+                }
+                Some(_) => {}
+            },
             None => local.join = None,
         }
         match &state.channel_dialog {
@@ -207,18 +241,40 @@ impl Dialogs {
                 }
             }
             Event::CloseInvite => Action::CloseInvite,
-            Event::JoinLink(link) => {
-                local.join = Some(link);
+            Event::ChooseCreate => Action::SetJoinStep(JoinStep::Create),
+            Event::ChooseJoin => Action::SetJoinStep(JoinStep::Join),
+            Event::BackToChoose => Action::SetJoinStep(JoinStep::Choose),
+            Event::CreateName(name) => {
+                if let Some(draft) = &mut local.join {
+                    draft.server_name = name;
+                }
                 return Task::none();
             }
-            Event::Find => {
+            Event::CreateServer => {
                 let busy = cx
                     .state()
                     .join
                     .as_ref()
-                    .is_some_and(|join| join.resolving || join.joining);
+                    .is_some_and(|join| join.resolving || join.joining || join.creating);
                 match &local.join {
-                    Some(link) if !busy => Action::FindInvite(link.clone()),
+                    Some(draft) if !busy => Action::CreateServer(draft.server_name.clone()),
+                    _ => return Task::none(),
+                }
+            }
+            Event::JoinLink(link) => {
+                if let Some(draft) = &mut local.join {
+                    draft.link = link;
+                }
+                return Task::none();
+            }
+            Event::JoinDirect => {
+                let busy = cx
+                    .state()
+                    .join
+                    .as_ref()
+                    .is_some_and(|join| join.resolving || join.joining || join.creating);
+                match &local.join {
+                    Some(draft) if !busy => Action::JoinInvite(draft.link.clone()),
                     _ => return Task::none(),
                 }
             }
@@ -231,7 +287,7 @@ impl Dialogs {
                 } else if join.preview.is_some() {
                     Action::JoinServer
                 } else {
-                    return self.update(Event::Find, cx);
+                    return self.update(Event::JoinDirect, cx);
                 }
             }
             Event::OpenCaptcha => Action::OpenJoinCaptcha,
@@ -441,39 +497,90 @@ impl<'a> View<'a> {
         ))
     }
 
-    /// Join a Server, or the dialog a clicked invite link opens: the field
-    /// (Join's alone), the server once found, how joining goes, and its
-    /// buttons.
+    /// Add a Server (Create or Join choice), Create a Server, or Join a
+    /// Server (direct in-app join or clicked invite link), with any preview,
+    /// captcha/status note, and buttons.
     fn join_server_view(self) -> Option<Element<'a, Message>> {
         let join = self.cx.state.join.as_ref()?;
-        let typed = self.s.join.as_deref()?;
+        let draft = self.s.join.as_ref()?;
         let theme = self.cx.look.theme;
-        let preview = join.preview.as_ref();
-        let busy = join.resolving || join.joining;
-        let title = if join.from_link {
-            "You've been invited to join a server"
-        } else {
-            "Join a Server"
+        let busy = join.resolving || join.joining || join.creating;
+        let title = match join.step {
+            JoinStep::Choose => "Add a Server",
+            JoinStep::Create => "Create a Server",
+            JoinStep::Join if join.from_link => "You've been invited to join a server",
+            JoinStep::Join => "Join a Server",
         };
         let mut body = vec![
             self.cx
                 .look
                 .dialog_head(title.to_owned(), message(Event::CloseJoin)),
         ];
-        if !join.from_link {
+        if join.step == JoinStep::Choose {
+            body.push(form::note(
+                theme,
+                "Create a new server for your friends or join an existing one with an invite.",
+            ));
+            body.push(
+                column![
+                    self.server_choice_card(
+                        Icon::CirclePlus,
+                        "Create a Server",
+                        "Start a new server from scratch",
+                        Event::ChooseCreate,
+                    ),
+                    self.server_choice_card(
+                        Icon::Users,
+                        "Join a Server",
+                        "Paste an invite link or code to join right away",
+                        Event::ChooseJoin,
+                    ),
+                ]
+                .spacing(10)
+                .into(),
+            );
+            body.push(buttons(vec![
+                action(theme, "Cancel", Kind::Ghost, Some(message(Event::CloseJoin))).into(),
+            ]));
+            return Some(crate::theme_art::framed_dialog(
+                self.cx,
+                body,
+                NARROW,
+                message(Event::CloseJoin),
+            ));
+        }
+
+        if join.step == JoinStep::Create {
+            body.extend([
+                form::note(
+                    theme,
+                    "Give your new server a name. You can always change it later.",
+                ),
+                form::heading(theme, "SERVER NAME"),
+                form::field(theme, CREATE_FIELD, "My Server", &draft.server_name)
+                    .padding([8.0, 10.0])
+                    .on_input(|name| message(Event::CreateName(name)))
+                    .on_submit(message(Event::CreateServer))
+                    .into(),
+            ]);
+        } else if !join.from_link {
             body.extend([
                 form::note(
                     theme,
                     "Paste an invite link or code to join a server you were invited to.",
                 ),
                 form::heading(theme, "INVITE LINK"),
-                form::field(theme, JOIN_FIELD, "https://discord.gg/yapfast", typed)
+                form::field(theme, JOIN_FIELD, "https://discord.gg/discy", &draft.link)
                     .padding([8.0, 10.0])
                     .on_input(|link| message(Event::JoinLink(link)))
-                    .on_submit(message(Event::Find))
+                    .on_submit(message(Event::JoinDirect))
                     .into(),
             ]);
         }
+
+        let preview = (join.step == JoinStep::Join)
+            .then_some(join.preview.as_ref())
+            .flatten();
         if let Some(preview) = preview {
             let detail = match (preview.members, preview.online) {
                 (Some(members), Some(online)) if members >= 5 || online > 0 => {
@@ -493,10 +600,13 @@ impl<'a> View<'a> {
                 ),
             );
         }
+
         let status = if join.form.is_some() {
-            "You joined. This server asks new members to fill in a form before they can talk, which Yapfast can't show yet. Finish it in Discord's web app."
+            "You joined. This server asks new members to fill in a form before they can talk, which Discy can't show yet. Finish it in Discord's web app."
         } else if join.captcha.is_some() {
             "Discord asks for a captcha first. Solve it in your browser."
+        } else if join.creating {
+            "Creating server..."
         } else if join.joining {
             "Joining..."
         } else if join.resolving {
@@ -512,30 +622,29 @@ impl<'a> View<'a> {
         if let Some(error) = &join.error {
             body.push(form::note_in(error.as_str(), theme.danger));
         }
-        let confirm = if join.form.is_some() {
-            "Open in browser"
-        } else if join.member {
-            "Open Server"
-        } else if preview.is_some() {
-            "Join in Browser"
-        } else if join.from_link {
-            ""
-        } else {
-            "Find Invite"
+
+        let confirm = match join.step {
+            JoinStep::Choose => None,
+            JoinStep::Create => Some(("Create", Event::CreateServer)),
+            JoinStep::Join if join.form.is_some() => Some(("Open in browser", Event::Confirm)),
+            JoinStep::Join if !join.from_link => Some(("Join Server", Event::JoinDirect)),
+            JoinStep::Join if join.member => Some(("Open Server", Event::Confirm)),
+            JoinStep::Join if preview.is_some() => Some(("Join Server", Event::Confirm)),
+            JoinStep::Join => None,
         };
-        let mut row_ = vec![
-            action(
-                theme,
-                if join.form.is_some() || confirm.is_empty() {
+        let (left_label, left_event) = if !join.from_link && join.form.is_none() {
+            ("Back", (!busy).then(|| message(Event::BackToChoose)))
+        } else {
+            (
+                if join.form.is_some() || confirm.is_none() {
                     "Close"
                 } else {
                     "Cancel"
                 },
-                Kind::Ghost,
                 Some(message(Event::CloseJoin)),
             )
-            .into(),
-        ];
+        };
+        let mut row_ = vec![action(theme, left_label, Kind::Ghost, left_event).into()];
         if join.captcha.is_some() {
             row_.push(
                 action(
@@ -547,13 +656,13 @@ impl<'a> View<'a> {
                 .into(),
             );
         }
-        if !confirm.is_empty() {
+        if let Some((label, event)) = confirm {
             row_.push(
                 action(
                     theme,
-                    confirm,
+                    label,
                     Kind::Primary,
-                    (!busy).then(|| message(Event::Confirm)),
+                    (!busy).then(|| message(event)),
                 )
                 .into(),
             );
@@ -565,6 +674,64 @@ impl<'a> View<'a> {
             NARROW,
             message(Event::CloseJoin),
         ))
+    }
+
+    fn server_choice_card(
+        self,
+        icon: Icon,
+        title: &'static str,
+        subtitle: &'static str,
+        on_press: Event,
+    ) -> Element<'a, Message> {
+        let theme = self.cx.look.theme;
+        let (surface, hover, pressed, border, text_ink, muted_ink, radius) = (
+            theme.sunken,
+            theme.hover,
+            theme.active,
+            theme.line,
+            theme.text,
+            theme.muted,
+            theme.radius(8.0),
+        );
+        let body = row![
+            self.cx.look.glyph(icon, 22, text_ink),
+            column![
+                text(title)
+                    .size(theme.type_size("body", 15.0))
+                    .font(theme.font("body", BOLD))
+                    .color(text_ink),
+                text(subtitle)
+                    .size(theme.type_size("muted", 12.0))
+                    .color(muted_ink),
+            ]
+            .spacing(2)
+            .width(Length::Fill),
+            self.cx.look.glyph(Icon::ChevronRight, 16, muted_ink),
+        ]
+        .spacing(12)
+        .align_y(Alignment::Center);
+        button(body)
+            .width(Length::Fill)
+            .padding([12, 14])
+            .on_press(message(on_press))
+            .style(move |_, status| {
+                let ground = match status {
+                    button::Status::Pressed => pressed,
+                    button::Status::Hovered => hover,
+                    button::Status::Active | button::Status::Disabled => surface,
+                };
+                button::Style {
+                    background: Some(ground.into()),
+                    text_color: text_ink,
+                    border: Border {
+                        color: border,
+                        width: 1.0,
+                        radius: radius.into(),
+                    },
+                    ..button::Style::default()
+                }
+            })
+            .into()
     }
 
     /// Making, copying or deleting a channel or category: where it goes or

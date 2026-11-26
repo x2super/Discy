@@ -627,7 +627,7 @@ pub(super) fn editor_tab_page<'a>(
     let profile = look.profile();
     let heading = |words: String| text(words).size(13).font(SEMIBOLD).color(inks.ink2);
     let soon = || {
-        text("Adding more from Yapfast is coming soon.")
+        text("Adding more from Discy is coming soon.")
             .size(12)
             .color(inks.ink3)
     };

@@ -225,13 +225,13 @@ impl<'a> Page<'a> {
                 shown,
                 linked.then(|| crate::app::settings(Event::Game(GameEvent::Show(!shown)))),
             )
-            .description("Yapfast looks for games among the programs running, and on Linux takes the Rich Presence games send. Your Discord account keeps this setting, so it's the same in Discord's apps.")
+            .description("Discy looks for games among the programs running, and on Linux takes the Rich Presence games send. Your Discord account keeps this setting, so it's the same in Discord's apps.")
             .locked("Link a Discord account first.")
             .view(self.cx.look),
             form::heading(theme, "CUSTOM GAMES"),
             form::note(
                 theme,
-                "Name a game by its executable, a file name or a full path, and what to show after Playing. These come before the games Yapfast knows, but a game's Rich Presence comes first.",
+                "Name a game by its executable, a file name or a full path, and what to show after Playing. These come before the games Discy knows, but a game's Rich Presence comes first.",
             ),
         ];
         for (index, (executable, name)) in self.cx.layout.prefs.game_executables.iter().enumerate()
@@ -322,7 +322,7 @@ impl<'a> Page<'a> {
         parts.push(form::heading(theme, "NEVER SHOW AS A GAME"));
         parts.push(form::note(
             theme,
-            "Some programs Yapfast takes for games aren't. Name one by its executable, a file name or a full path, or by the name shown after Playing, and it isn't shown as the game you play.",
+            "Some programs Discy takes for games aren't. Name one by its executable, a file name or a full path, or by the name shown after Playing, and it isn't shown as the game you play.",
         ));
         for (index, entry) in self.cx.layout.prefs.blocked_games.iter().enumerate() {
             // On, it's hidden; off, it's allowed to show as a game again,
@@ -400,7 +400,7 @@ impl<'a> Page<'a> {
         if !scanning {
             parts.push(form::note(
                 theme,
-                "Choose from detected games lists the programs Yapfast takes for games while Share the game you play is on.",
+                "Choose from detected games lists the programs Discy takes for games while Share the game you play is on.",
             ));
         }
         form::page(parts)

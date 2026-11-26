@@ -5123,11 +5123,11 @@ mod tests {
         )
         .unwrap();
         let mut themes = Themes::read(folder.path(), &Layout::read(folder.path()));
-        assert_eq!(themes.previous(), Some(("yap", "Yap")));
+        assert_eq!(themes.previous(), Some(("yap", "Discy")));
 
         // Choosing what is already shown leaves Back useful.
         themes.choose(folder.path(), "sakura");
-        assert_eq!(themes.previous(), Some(("yap", "Yap")));
+        assert_eq!(themes.previous(), Some(("yap", "Discy")));
 
         themes.choose(folder.path(), "bonfire");
         assert_eq!(themes.previous(), Some(("sakura", "Sakura")));

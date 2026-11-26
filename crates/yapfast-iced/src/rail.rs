@@ -130,10 +130,9 @@ pub const FOLDER: f32 = 48.0;
 pub const GAP: f32 = 8.0;
 /// A tile's corners: a server's, and a folder's.
 const RADIUS: f32 = 12.0;
-/// The add-a-server tile's id, and the disc and plus drawn on it.
+/// The add-a-server tile's id and the plus drawn on it.
 const ADD: &str = "+";
-const ADD_DISC: f32 = 18.0;
-const ADD_PLUS: u32 = 14;
+const ADD_PLUS: u32 = 22;
 const FOLDER_RADIUS: f32 = 16.0;
 /// Room above each tile for the insertion line in the middle of the gap.
 const INSERTION_LINE: f32 = 2.0;
@@ -1336,7 +1335,7 @@ impl<'a> View<'a> {
             content = content.push(self.tree_button(
                 "+".into(),
                 String::new(),
-                "+ join".into(),
+                "+ add".into(),
                 false,
                 false,
                 "",
@@ -1418,8 +1417,8 @@ impl<'a> View<'a> {
             cells = cells.push(
                 container(self.action_tile(
                     "+",
-                    Icon::Plus,
-                    "Join a server",
+                    Icon::Add,
+                    "Add a server",
                     Message::Rail(Event::Join),
                 ))
                 .width(cell_width)
@@ -1603,18 +1602,9 @@ impl<'a> View<'a> {
             (theme.raised, theme.accent)
         };
         if self.framed() && icon == Icon::Logo {
-            // As Slint's framed home tile: the logo in the theme's pink
-            // ink on the raised ground in the print's window, turned with
-            // the print (the logo itself stays straight).
-            let ink = if lit {
-                theme.on_accent
-            } else {
-                theme.token_colour("accent-text", theme.accent)
-            };
-            let ground = theme.raised;
             return crate::theme_art::card_ground(
-                self.cx.look.glyph(icon, 24, ink).boxed(Length::Fill).into(),
-                Some(ground),
+                self.cx.look.drawn(icon, 28).boxed(Length::Fill).into(),
+                Some(theme.raised),
                 iced::Shadow::default(),
                 self.lean(""),
                 self.face_pivot("", lit && self.s.home.selected),
@@ -1622,7 +1612,7 @@ impl<'a> View<'a> {
                 crate::theme_art::CardMarks::default(),
             );
         }
-        if self.framed() && icon == Icon::Plus {
+        if self.framed() && icon == Icon::Add {
             // Slint's add button on a framed rail: a plain 48 px box in the
             // rail icon's border and shadow, the plus in pink ink.
             let side = width.min(height).min(48.0);
@@ -1648,13 +1638,14 @@ impl<'a> View<'a> {
         }
         // A gel theme's home and action tiles are gel buttons too.
         if crate::theme_art::has_gel(self.cx) {
-            let face = self
-                .cx
-                .look
-                .glyph(icon, 24, ink)
-                .boxed(Length::Fill)
-                .width(width)
-                .height(height);
+            let face = if icon == Icon::Logo {
+                self.cx.look.drawn(icon, 28)
+            } else {
+                self.cx.look.glyph(icon, 24, ink)
+            }
+            .boxed(Length::Fill)
+            .width(width)
+            .height(height);
             let tone = if lit {
                 crate::theme_art::GelTone::Lit
             } else {
@@ -1664,6 +1655,16 @@ impl<'a> View<'a> {
             {
                 return gel;
             }
+        }
+        if icon == Icon::Logo {
+            return self
+                .cx
+                .look
+                .drawn(icon, width.min(height).round() as u32)
+                .boxed(Length::Fill)
+                .width(width)
+                .height(height)
+                .into();
         }
         // In a theme's tile window, as Slint's `TilePicture`: the raised
         // (or, lit, the accent) paint in the window's shape, without the
@@ -1737,20 +1738,10 @@ impl<'a> View<'a> {
         } else {
             crate::theme::mix(theme.raised, theme.rail, 0.83)
         };
-        let (disc, plus) = (theme.text, theme.rail);
-        let glyph = self
-            .cx
-            .look
-            .glyph(Icon::Plus, ADD_PLUS, plus)
-            .boxed(ADD_DISC);
-        container(
-            container(glyph)
-                .center(ADD_DISC)
-                .style(move |_| rounded(disc, ADD_DISC / 2.0)),
-        )
-        .center(TILE)
-        .style(move |_| rounded(ground, RADIUS))
-        .into()
+        container(self.cx.look.glyph(Icon::Add, ADD_PLUS, theme.text))
+            .center(TILE)
+            .style(move |_| rounded(ground, RADIUS))
+            .into()
     }
 
     /// A tile at the rail's foot that does something rather than open a

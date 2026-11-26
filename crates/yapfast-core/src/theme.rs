@@ -604,7 +604,7 @@ pub struct BuiltIn {
 pub const BUILT_IN: [BuiltIn; 10] = [
     BuiltIn {
         id: "yap",
-        name: "Yap",
+        name: "Discy",
         theme: YAP,
     },
     BuiltIn {
@@ -946,9 +946,9 @@ impl std::fmt::Display for ImportError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_str(match self {
             Self::TooLarge => "That is too large to be a theme.",
-            Self::NotATheme => "That is not a Yapfast theme.",
-            Self::Newer => "That theme was made by a newer Yapfast. Update to use it.",
-            Self::Empty => "That theme names no colours Yapfast knows.",
+            Self::NotATheme => "That is not a Discy theme.",
+            Self::Newer => "That theme was made by a newer Discy. Update to use it.",
+            Self::Empty => "That theme names no colours Discy knows.",
         })
     }
 }

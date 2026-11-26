@@ -185,7 +185,7 @@ fn something_that_isnt_a_picture_is_refused_plainly() {
     let refused = prepare_picture(b"not a picture at all")
         .err()
         .expect("refused");
-    assert_eq!(refused, "That file isn't a picture Yapfast can use");
+    assert_eq!(refused, "That file isn't a picture Discy can use");
 }
 
 #[test]

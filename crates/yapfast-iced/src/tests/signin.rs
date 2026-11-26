@@ -17,7 +17,7 @@ fn without_an_account_the_sign_in_screen_shows_and_the_preview_leaves_it() {
     let folder = tempfile::tempdir_in(local()).expect("test folder");
     let mut app = start(&folder, false);
     assert!(!crate::signin::workspace(&app));
-    assert!(shows(&app, "Sign in to Yapfast"));
+    assert!(shows(&app, "Sign in to Discy"));
     if signin::MATRIX {
         assert!(shows(&app, "Use your existing Matrix account."));
     } else {
@@ -50,7 +50,7 @@ fn says_a_pasted_token_can_sign_its_app_out_and_that_unlinking_left_it() {
     let mut app = start(&folder, false);
     let note = "Pasting a token from another app can make Discord sign that app out. \
                 The QR code is the safe way to link.";
-    let kept = "Yapfast forgot your login on this computer. If you pasted a token, \
+    let kept = "Discy forgot your login on this computer. If you pasted a token, \
                 the app or browser you copied it from is still signed in.";
     assert!(shows(&app, note));
     assert!(!shows(&app, kept));
@@ -163,13 +163,13 @@ fn a_saved_account_restoring_at_start_shows_only_the_notice_until_it_fails() {
     app.sign_in.starting = true;
     let _ = app.sync();
     assert!(shows(&app, "Connecting to Discord..."));
-    assert!(!shows(&app, "Sign in to Yapfast"));
+    assert!(!shows(&app, "Sign in to Discy"));
     let state = &mut app.client.app.state;
     state.busy = false;
     state.notice = Some("Discord said no.".into());
     let _ = app.sync();
     assert!(!app.sign_in.starting);
-    assert!(shows(&app, "Sign in to Yapfast"));
+    assert!(shows(&app, "Sign in to Discy"));
 }
 
 #[test]
@@ -189,7 +189,7 @@ fn the_sign_in_screen_says_the_gpu_failed_until_dismissed() {
     assert!(!shows(&app, crate::graphics::NOTICE));
     app.shell.gpu_notice = true;
     assert!(shows(&app, crate::graphics::NOTICE));
-    assert!(shows(&app, "Sign in to Yapfast"), "over the card");
+    assert!(shows(&app, "Sign in to Discy"), "over the card");
     interact(&mut app, |ui| {
         ui.click("Dismiss").expect("Dismiss");
     });

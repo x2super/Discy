@@ -101,7 +101,7 @@ impl StreamOpenings {
             }
             None => {
                 let _ = reply.send(Err(anyhow!(
-                    "That isn't a stream Yapfast knows how to watch."
+                    "That isn't a stream Discy knows how to watch."
                 )));
                 Ok(())
             }

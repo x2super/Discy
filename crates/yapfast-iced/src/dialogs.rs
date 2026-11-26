@@ -137,7 +137,7 @@ pub fn leaving_view<'a>(link: Option<&'a str>, cx: Ctx<'a>) -> Option<Element<'a
     let theme = cx.look.theme;
     let sunken = theme.sunken;
     let body = column![
-        text("Leaving Yapfast")
+        text("Leaving Discy")
             .size(18)
             .font(BOLD)
             .color(theme.text),

@@ -858,7 +858,7 @@ pub(super) fn command(
                                 .unwrap_or_default();
                             let data = tokio::fs::read(&file.path)
                                 .await
-                                .map_err(|_| format!("Yapfast could not read {name}."))?;
+                                .map_err(|_| format!("Discy could not read {name}."))?;
                             read.push((
                                 super::open_channel::upload_name(&name, file.spoiler),
                                 data,
@@ -1190,6 +1190,38 @@ pub(super) fn command(
                 let _ = events.send(Event::ServerJoined {
                     code,
                     result: Err(discord.err().unwrap_or(NOT_DISCORD).into()),
+                });
+            }
+        }
+        return None;
+    }
+    if let Command::Discord(DiscordCommand::CreateServer { name }) = command {
+        match discord {
+            Ok(discord) => {
+                let (discord, events) = (discord.clone(), events.clone());
+                tokio::spawn(async move {
+                    let captchas = events.clone();
+                    let result = discord
+                        .create_guild(&name, |page| {
+                            let _ = captchas.send(Event::CreateCaptcha {
+                                page: page.to_owned(),
+                            });
+                        })
+                        .await
+                        .map(|guild| discord::server_id(&guild))
+                        .map_err(|error| {
+                            tracing::warn!(
+                                error = format!("{error:#}"),
+                                "could not create a server"
+                            );
+                            format!("Couldn't create the server: {error}")
+                        });
+                    let _ = events.send(Event::ServerCreated { result });
+                });
+            }
+            Err(why) => {
+                let _ = events.send(Event::ServerCreated {
+                    result: Err(why.into()),
                 });
             }
         }

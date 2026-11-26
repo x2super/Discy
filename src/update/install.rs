@@ -139,12 +139,12 @@ pub fn target_for(
                 .to_path_buf();
             let folder = current.parent().ok_or("The AppImage has no folder.")?;
             if !writable(folder) {
-                return Err("Yapfast can't write to the AppImage's folder.".into());
+                return Err("Discy can't write to the AppImage's folder.".into());
             }
             Ok(Target::AppImage { asset, current })
         }
         _ => {
-            let folder = program.parent().ok_or("Yapfast has no folder.")?;
+            let folder = program.parent().ok_or("Discy has no folder.")?;
             // The installer left its uninstaller there; a folder without one
             // was unpacked by hand or installed by something else.
             if !folder.join("unins000.exe").is_file() {
@@ -154,7 +154,7 @@ pub fn target_for(
                 );
             }
             if !writable(folder) {
-                return Err("Yapfast can't write to its own folder.".into());
+                return Err("Discy can't write to its own folder.".into());
             }
             Ok(Target::Installer {
                 asset,

@@ -83,7 +83,7 @@ pub fn prepare(path: &Path) -> Result<Vec<u8>, String> {
 
 /// Replaces the saved copy only once the new file is complete.
 pub fn save(root: &Path, target: IconTarget, png: &[u8]) -> Result<(), String> {
-    let save = "Could not save the icon in Yapfast’s data folder.";
+    let save = "Could not save the icon in Discy’s data folder.";
     std::fs::create_dir_all(root).map_err(|_| save)?;
     let mut file = tempfile::NamedTempFile::new_in(root).map_err(|_| save)?;
     file.write_all(png).map_err(|_| save)?;
@@ -126,8 +126,8 @@ impl Artwork {
             Self::Default => rasterize(svg.as_bytes(), size),
             Self::Theme(theme) => {
                 let svg = svg
-                    .replace("#ffbf47", &format!("#{:06x}", theme.accent.rgb_part()))
-                    .replace("#1d1607", &format!("#{:06x}", theme.on_accent.rgb_part()));
+                    .replace("#5865f2", &format!("#{:06x}", theme.accent.rgb_part()))
+                    .replace("#ffffff", &format!("#{:06x}", theme.on_accent.rgb_part()));
                 rasterize(svg.as_bytes(), size)
             }
             Self::Custom(image) => Some(rgba(scale(image, size))),
@@ -135,9 +135,11 @@ impl Artwork {
     }
 
     pub fn tray(&self, size: u32, unread: bool) -> Option<Rgba> {
-        let accent = match self {
-            Self::Default => 0xffbf47,
-            Self::Theme(theme) => theme.accent.rgb_part(),
+        let mut svg = match self {
+            Self::Default => include_str!("../packaging/icon.svg").to_owned(),
+            Self::Theme(theme) => include_str!("../packaging/icon.svg")
+                .replace("#5865f2", &format!("#{:06x}", theme.accent.rgb_part()))
+                .replace("#ffffff", &format!("#{:06x}", theme.on_accent.rgb_part())),
             Self::Custom(image) => {
                 let mut pixels = scale(image, size);
                 if unread {
@@ -154,19 +156,13 @@ impl Artwork {
                 return Some(rgba(pixels));
             }
         };
-        let mut svg = include_str!("../crates/yapfast-iced-kit/icons/logo.svg").replacen(
-            r##"fill="#fff" mask"##,
-            &format!("fill=\"#{accent:06x}\" mask"),
-            1,
-        );
         if unread {
-            svg = svg
-                .replacen("</mask>", r#"<circle cx="74" cy="74" r="21" /></mask>"#, 1)
-                .replacen(
-                    "</svg>",
-                    r##"<circle cx="74" cy="74" r="15" fill="#f0545e" /></svg>"##,
-                    1,
-                );
+            let cut = r##"<defs><mask id="cutout"><rect x="0" y="0" width="100" height="100" fill="#fff"/><circle cx="78" cy="78" r="24" fill="#000"/></mask></defs><g mask="url(#cutout)">"##;
+            let dot = r##"</g><circle cx="78" cy="78" r="17" fill="#f0545e"/></svg>"##;
+            if let Some(open_end) = svg.find('>') {
+                svg.insert_str(open_end + 1, cut);
+                svg = svg.replacen("</svg>", dot, 1);
+            }
         }
         rasterize(svg.as_bytes(), size)
     }
@@ -278,7 +274,7 @@ impl Drop for NativeIcon {
 #[cfg(windows)]
 type WindowIcons = [NativeIcon; 2];
 #[cfg(windows)]
-const ICON_PROPERTY: windows_sys::core::PCWSTR = windows_sys::w!("YapfastWindowIcons");
+const ICON_PROPERTY: windows_sys::core::PCWSTR = windows_sys::w!("DiscyWindowIcons");
 
 /// Gives the running window its own icons at the Windows title bar and
 /// taskbar sizes. The window owns both until they are replaced or it closes.

@@ -543,7 +543,7 @@ async fn send(
     let offered = lock(&shared.offers).clone();
     let chosen = connection.codec.unwrap_or(offered[0]);
     if !offered.contains(&chosen) {
-        bail!("Discord asked for {chosen:?} video, and Yapfast offered {offered:?}");
+        bail!("Discord asked for {chosen:?} video, and Discy offered {offered:?}");
     }
     *lock(&shared.chosen) = Some(chosen);
     tracing::info!(codec = ?chosen, ?offered, "Discord chose the stream's codec");
@@ -671,7 +671,7 @@ async fn send(
                             *lock(&shared.chosen) = Some(codec);
                             shared.keyframe.store(true, Ordering::Relaxed);
                         } else {
-                            tracing::warn!(?codec, "Discord asked for a codec Yapfast didn't offer");
+                            tracing::warn!(?codec, "Discord asked for a codec Discy didn't offer");
                         }
                     }
                     // Tell whoever connected about the video again, in case

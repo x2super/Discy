@@ -144,7 +144,7 @@ pub fn view<'a>(mfa: &'a Mfa, cx: Ctx<'a>) -> Option<Element<'a, Message>> {
             "Backup code",
         ),
         Some(MfaMethod::Passkey) | None => (
-            "Discord asks for a passkey or security key, which Yapfast can't use. Confirm \
+            "Discord asks for a passkey or security key, which Discy can't use. Confirm \
              in Discord's app, then try again."
                 .to_owned(),
             "",

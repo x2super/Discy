@@ -427,7 +427,7 @@ pub fn check(files: &Files, strictness: Strictness) -> Report {
             Ok(variant) => {
                 match crate::theme::find(&variant.base) {
                     None => report.errors.push(format!(
-                        "the {} variant's base \"{}\" isn't a theme Yapfast comes with",
+                        "the {} variant's base \"{}\" isn't a theme Discy comes with",
                         mode.name(),
                         variant.base
                     )),
@@ -742,7 +742,7 @@ fn display_type(resolved: &[Resolved], files: &Files) -> Option<String> {
         format!(
             "display type for reading text: {}. Some people find it hard to read; \
              Settings → Appearance → Readable text keeps the theme and draws messages, \
-             names and labels in Yapfast's own font, without text effects",
+             names and labels in Discy's own font, without text effects",
             found.join(", ")
         )
     })
@@ -1412,7 +1412,7 @@ pub fn check_font(bytes: &[u8]) -> Result<(), String> {
     }
     let parsed = std::panic::catch_unwind(|| {
         let face = ttf_parser::Face::parse(bytes, 0)
-            .map_err(|error| format!("isn't a font Yapfast reads ({error})"))?;
+            .map_err(|error| format!("isn't a font Discy reads ({error})"))?;
         if face.number_of_glyphs() == 0 {
             return Err("holds no glyphs".to_owned());
         }
@@ -1431,7 +1431,7 @@ pub fn check_font(bytes: &[u8]) -> Result<(), String> {
     match parsed {
         Ok(Ok(_)) => Ok(()),
         Ok(Err(error)) => Err(error),
-        Err(_) => Err("isn't a font Yapfast reads".into()),
+        Err(_) => Err("isn't a font Discy reads".into()),
     }
 }
 
@@ -1442,12 +1442,12 @@ pub fn check_image(bytes: &[u8]) -> Result<(), String> {
         return Err("a picture is at most 2 MiB".into());
     }
     let format =
-        image::guess_format(bytes).map_err(|_| "isn't a picture Yapfast reads".to_owned())?;
+        image::guess_format(bytes).map_err(|_| "isn't a picture Discy reads".to_owned())?;
     if !matches!(
         format,
         image::ImageFormat::Png | image::ImageFormat::Jpeg | image::ImageFormat::WebP
     ) {
-        return Err("is a picture Yapfast doesn't take: use PNG, JPEG or WebP".into());
+        return Err("is a picture Discy doesn't take: use PNG, JPEG or WebP".into());
     }
     let mut reader = image::ImageReader::with_format(std::io::Cursor::new(bytes), format);
     let mut limits = image::Limits::default();
@@ -1493,7 +1493,7 @@ pub fn check_svg(bytes: &[u8]) -> Result<(), String> {
         ..Default::default()
     };
     let document = resvg::usvg::roxmltree::Document::parse_with_options(text, options)
-        .map_err(|error| format!("isn't an SVG Yapfast reads ({error})"))?;
+        .map_err(|error| format!("isn't an SVG Discy reads ({error})"))?;
     for node in document.descendants().filter(|node| node.is_element()) {
         let name = node.tag_name().name();
         if SVG_REFUSED.contains(&name) {
@@ -1869,7 +1869,7 @@ mod tests {
             report
                 .errors
                 .iter()
-                .any(|error| error.contains("isn't a theme Yapfast comes with"))
+                .any(|error| error.contains("isn't a theme Discy comes with"))
         );
     }
 
@@ -2609,7 +2609,7 @@ mod tests {
         assert!(report.passed(), "{:?}", report.errors);
         let notes = report.notes.join("\n");
         assert!(
-            notes.contains("\"cursors\": Yapfast doesn't use custom cursors"),
+            notes.contains("\"cursors\": Discy doesn't use custom cursors"),
             "{notes}"
         );
         assert!(notes.contains("\"variants.dark.cursors\""), "{notes}");

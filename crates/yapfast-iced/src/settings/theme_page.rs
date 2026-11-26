@@ -71,7 +71,7 @@ impl<'a> Page<'a> {
             form::title(theme, "Themes"),
             form::note(
                 theme,
-                "Themes restyle Yapfast: its colours, fonts, shapes, art and sounds. A theme is data, never code, and you see what one changes before it's installed.",
+                "Themes restyle Discy: its colours, fonts, shapes, art and sounds. A theme is data, never code, and you see what one changes before it's installed.",
             ),
             self.theme_tabs(),
         ];
@@ -655,7 +655,7 @@ impl<'a> Page<'a> {
             form::heading(theme, "THEMES THAT COULDN'T BE OPENED"),
             form::note(
                 theme,
-                "They stay installed, but Yapfast won't use files it can't check.",
+                "They stay installed, but Discy won't use files it can't check.",
             ),
             rows.into(),
         ])
@@ -712,7 +712,7 @@ impl<'a> Page<'a> {
             Icon::Palette,
             theme.accent_text(),
             "Make a theme of your own",
-            Some("Pick a colour or a picture and Yapfast works out the rest, keeping text readable. Then shape it: message style, corners, fonts, glass. It's saved with your themes, and Export makes it a package you can share.".into()),
+            Some("Pick a colour or a picture and Discy works out the rest, keeping text readable. Then shape it: message style, corners, fonts, glass. It's saved with your themes, and Export makes it a package you can share.".into()),
             vec![self.ring(
                 Spot::NewTheme,
                 action(
@@ -788,7 +788,7 @@ impl<'a> Page<'a> {
                         ))),
                     )
                     .description(format!(
-                        "{name}'s sounds for messages, mentions, calls and the rest, in place of Yapfast's. Your sound volumes and Do Not Disturb still apply."
+                        "{name}'s sounds for messages, mentions, calls and the rest, in place of Discy's. Your sound volumes and Do Not Disturb still apply."
                     ))
                     .view(self.cx.look),
                 );
@@ -803,7 +803,7 @@ impl<'a> Page<'a> {
                             !prefs.interface,
                         ))),
                     )
-                    .description("Only while Yapfast is in front, and never in Do Not Disturb.")
+                    .description("Only while Discy is in front, and never in Do Not Disturb.")
                     .view(self.cx.look),
                 );
                 let owned = id.to_owned();
@@ -926,7 +926,7 @@ impl<'a> Page<'a> {
         let said = match performance {
             0 => "Everything an installed theme has: every animation, at the rate it asks for.",
             1 => {
-                "Heavy animations stay still, the rest run at up to 30 frames a second and pause while Yapfast isn't focused."
+                "Heavy animations stay still, the rest run at up to 30 frames a second and pause while Discy isn't focused."
             }
             _ => "Colours, fonts, shapes and spacing only: no theme animation, effect or motion.",
         };

@@ -238,9 +238,9 @@ fn decrypt(key: &RsaPrivateKey, encrypted: &Value) -> Result<Vec<u8>> {
 
 fn login(key: &RsaPrivateKey, encrypted: &Value) -> Result<String> {
     let token = String::from_utf8(decrypt(key, encrypted)?)
-        .context("Discord's login service sent a login Yapfast can't read")?;
+        .context("Discord's login service sent a login Discy can't read")?;
     if token.is_empty() || token.contains(char::is_whitespace) {
-        bail!("Discord's login service sent a login Yapfast can't read");
+        bail!("Discord's login service sent a login Discy can't read");
     }
     Ok(token)
 }

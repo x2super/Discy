@@ -492,9 +492,9 @@ impl<'a> Page<'a> {
             form::note(
                 theme,
                 if push {
-                    "Yapfast sends your microphone only while you hold a key."
+                    "Discy sends your microphone only while you hold a key."
                 } else {
-                    "Yapfast sends your voice when it hears you speak."
+                    "Discy sends your voice when it hears you speak."
                 },
             ),
         ]));
@@ -625,7 +625,7 @@ impl<'a> Page<'a> {
                     effects,
                     Some(voice_message(Event::WindowsEffects(!effects))),
                 )
-                .description("Runs the effects Windows and your sound driver add to the microphone, such as their own noise suppression. Off, Yapfast skips them, as they can muffle your voice on top of Yapfast's. Turn it on if your microphone sounds worse without them, as some laptop microphones can.")
+                .description("Runs the effects Windows and your sound driver add to the microphone, such as their own noise suppression. Off, Discy skips them, as they can muffle your voice on top of Discy's. Turn it on if your microphone sounds worse without them, as some laptop microphones can.")
                 .view(self.cx.look),
             );
         }
@@ -862,9 +862,9 @@ impl<'a> Page<'a> {
             .as_ref()
             .is_some_and(|gate| gate.failed())
         {
-            "Yapfast can't read this microphone. Check that it's connected, or choose another."
+            "Discy can't read this microphone. Check that it's connected, or choose another."
         } else {
-            "Yapfast sends your voice when it's louder than the handle, and other sounds when they're 18 dB louder still. The bar is your microphone after noise suppression and at its volume, as Yapfast hears it to decide."
+            "Discy sends your voice when it's louder than the handle, and other sounds when they're 18 dB louder still. The bar is your microphone after noise suppression and at its volume, as Discy hears it to decide."
         };
         form::group([
             form::heading(theme, "INPUT SENSITIVITY IN DISCORD CALLS"),
@@ -911,15 +911,15 @@ impl<'a> Page<'a> {
             match gate {
                 None => ("", ""),
                 Some(gate) if gate.failed() => (
-                    "Yapfast can't read this microphone.",
+                    "Discy can't read this microphone.",
                     "Check that it's connected, or choose another.",
                 ),
                 Some(gate) if gate.playback_failed() => (
-                    "Yapfast can't play your voice back.",
+                    "Discy can't play your voice back.",
                     "Check your speakers, or choose others.",
                 ),
                 Some(gate) if gate.no_input() => (
-                    "Yapfast isn't detecting any input from your mic.",
+                    "Discy isn't detecting any input from your mic.",
                     "Please check that you've selected the right input device.",
                 ),
                 Some(_) => ("Playing back your beautiful voice", ""),
@@ -950,7 +950,7 @@ impl<'a> Page<'a> {
             form::heading(theme, "MIC TEST"),
             form::note(
                 theme,
-                "Having mic issues? Start a test and say something fun, and Yapfast plays your voice back to you, with your noise suppression and volumes. Wear headphones, or it echoes.",
+                "Having mic issues? Start a test and say something fun, and Discy plays your voice back to you, with your noise suppression and volumes. Wear headphones, or it echoes.",
             ),
             row![
                 button,

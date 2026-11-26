@@ -53,7 +53,7 @@ impl<'a> Page<'a> {
             form::title(theme, "Sounds"),
             form::note(
                 theme,
-                "Yapfast plays these as you and others join and leave a call, as you mute and deafen, as others start and stop streaming, as they start and stop watching your stream or the one you watch, and for messages that notify, except in the conversation in front of you. They play on the speakers chosen for calls.",
+                "Discy plays these as you and others join and leave a call, as you mute and deafen, as others start and stop streaming, as they start and stop watching your stream or the one you watch, and for messages that notify, except in the conversation in front of you. They play on the speakers chosen for calls.",
             ),
             form::group([
                 form::heading(theme, "SOUND SET"),

@@ -211,7 +211,7 @@ impl Themes {
 
     fn load(&self, id: &str, entry: &Entry) -> Result<Installed> {
         if !is_address(&entry.store) {
-            anyhow::bail!("its store directory isn't one Yapfast names");
+            anyhow::bail!("its store directory isn't one Discy names");
         }
         let folder = self.root.join(STORE).join(&entry.store);
         let text = fs::read_to_string(folder.join(MANIFEST))

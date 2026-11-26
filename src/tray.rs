@@ -89,14 +89,10 @@ impl Tray {
     }
 }
 
-/// Yapfast's logo with the Windows taskbar count cut into its corner.
+/// Discy's logo with the Windows taskbar count cut into its corner.
 #[cfg(windows)]
 pub(crate) fn taskbar_badge(size: u32, count: u8) -> Option<crate::icon::Rgba> {
-    let svg = include_str!("../crates/yapfast-iced-kit/icons/logo.svg").replacen(
-        r##"fill="#fff" mask"##,
-        r##"fill="#ffbf47" mask"##,
-        1,
-    );
+    let mut svg = include_str!("../packaging/icon.svg").to_owned();
     // Stroked digits stay readable at small sizes and need no font.
     const DIGITS: [&str; 9] = [
         "M2 4L7 0V16M3 16H11",
@@ -111,16 +107,24 @@ pub(crate) fn taskbar_badge(size: u32, count: u8) -> Option<crate::icon::Rgba> {
     ];
     let digit = DIGITS[usize::from(count.min(9) - 1)];
     let (left, x, plus) = if count > 9 {
-        (47, 52.0, "M16 8H27M21.5 2.5V13.5")
+        (42, 48.0, "M16 8H27M21.5 2.5V13.5")
     } else {
-        (57, 66.5, "")
+        (56, 69.0, "")
     };
     let badge = format!(
-        r#"<rect x="{left}" y="12" width="{}" height="31" rx="15.5""#,
-        90 - left
+        r#"<rect x="{left}" y="4" width="{}" height="38" rx="19""#,
+        96 - left
     );
-    let svg = svg.replacen("</mask>", &format!(r##"{badge} stroke="#000" stroke-width="6"/></mask>"##), 1)
-        .replacen("</svg>", &format!(r##"{badge} fill="#d12c43"/><path transform="translate({x} 18) scale(1.18)" d="{digit}{plus}" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>"##), 1);
+    let cut = format!(
+        r##"<defs><mask id="cutout"><rect x="0" y="0" width="100" height="100" fill="#fff"/>{badge} fill="#000" stroke="#000" stroke-width="6"/></mask></defs><g mask="url(#cutout)">"##
+    );
+    let overlay = format!(
+        r##"</g>{badge} fill="#d12c43"/><path transform="translate({x} 13) scale(1.25)" d="{digit}{plus}" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>"##
+    );
+    if let Some(open_end) = svg.find('>') {
+        svg.insert_str(open_end + 1, &cut);
+        svg = svg.replacen("</svg>", &overlay, 1);
+    }
     crate::icon::rasterize(svg.as_bytes(), size)
 }
 
@@ -222,7 +226,7 @@ mod linux {
             Ok(handle) => handle,
             Err(error) => {
                 online.store(false, Ordering::Relaxed);
-                tracing::info!(%error, "no tray icon; closing the window quits Yapfast");
+                tracing::info!(%error, "no tray icon; closing the window quits Discy");
                 return;
             }
         };
@@ -262,11 +266,11 @@ mod linux {
 
     impl ksni::Tray for Item {
         fn id(&self) -> String {
-            "yapfast".into()
+            "discy".into()
         }
 
         fn title(&self) -> String {
-            "Yapfast".into()
+            "Discy".into()
         }
 
         fn category(&self) -> ksni::Category {
@@ -279,7 +283,7 @@ mod linux {
 
         fn tool_tip(&self) -> ksni::ToolTip {
             ksni::ToolTip {
-                title: "Yapfast".into(),
+                title: "Discy".into(),
                 description: if self.shown.unread {
                     "Unread messages".into()
                 } else {
@@ -302,13 +306,13 @@ mod linux {
                 }
                 .into()
             };
-            let mut menu = vec![item("Open Yapfast", Choice::Open)];
+            let mut menu = vec![item("Open Discy", Choice::Open)];
             if self.shown.call {
                 menu.push(item("Disconnect", Choice::Disconnect));
             }
             menu.push(MenuItem::Separator);
             menu.push(item("Check for updates", Choice::CheckForUpdates));
-            menu.push(item("Restart Yapfast", Choice::Restart));
+            menu.push(item("Restart Discy", Choice::Restart));
             menu.push(MenuItem::Separator);
             menu.push(item("Quit", Choice::Quit));
             menu
@@ -403,7 +407,7 @@ mod windows {
                 let class = WNDCLASSW {
                     lpfnWndProc: Some(procedure),
                     hInstance: instance,
-                    lpszClassName: w!("YapfastTray"),
+                    lpszClassName: w!("DiscyTray"),
                     ..std::mem::zeroed()
                 };
                 RegisterClassW(&class);
@@ -411,8 +415,8 @@ mod windows {
                 // which wouldn't hear that Explorer restarted.
                 let window = CreateWindowExW(
                     0,
-                    w!("YapfastTray"),
-                    w!("Open Yapfast"),
+                    w!("DiscyTray"),
+                    w!("Open Discy"),
                     WS_OVERLAPPED,
                     0,
                     0,
@@ -437,12 +441,12 @@ mod windows {
                     hIcon: icons[0].0,
                     ..std::mem::zeroed()
                 };
-                for (place, unit) in data.szTip.iter_mut().zip("Yapfast".encode_utf16()) {
+                for (place, unit) in data.szTip.iter_mut().zip("Discy".encode_utf16()) {
                     *place = unit;
                 }
                 let added = notify(NIM_ADD, &data);
                 if !added {
-                    tracing::info!("no notification area; closing the window quits Yapfast");
+                    tracing::info!("no notification area; closing the window quits Discy");
                 }
                 ICON.set(Some(Icon {
                     data,
@@ -572,13 +576,13 @@ mod windows {
                     ..std::mem::zeroed()
                 },
             );
-            AppendMenuW(menu, MF_STRING, OPEN, w!("Open Yapfast"));
+            AppendMenuW(menu, MF_STRING, OPEN, w!("Open Discy"));
             if call {
                 AppendMenuW(menu, MF_STRING, DISCONNECT, w!("Disconnect"));
             }
             AppendMenuW(menu, MF_SEPARATOR, 0, std::ptr::null());
             AppendMenuW(menu, MF_STRING, CHECK_FOR_UPDATES, w!("Check for updates"));
-            AppendMenuW(menu, MF_STRING, RESTART, w!("Restart Yapfast"));
+            AppendMenuW(menu, MF_STRING, RESTART, w!("Restart Discy"));
             AppendMenuW(menu, MF_SEPARATOR, 0, std::ptr::null());
             AppendMenuW(menu, MF_STRING, QUIT, w!("Quit"));
             SetMenuDefaultItem(menu, OPEN as u32, 0);
@@ -634,11 +638,12 @@ mod none {
 #[cfg(test)]
 mod tests {
     #[test]
-    fn the_logo_is_marigold_and_unread_adds_a_red_dot() {
-        let plain = super::Artwork::Default.tray(32, false).unwrap();
-        let unread = super::Artwork::Default.tray(32, true).unwrap();
-        assert_eq!((plain.width, plain.height), (32, 32));
-        let marigold = |pixel: &[u8]| pixel == [0xff, 0xbf, 0x47, 255];
+    fn the_logo_is_blue_and_unread_adds_a_red_dot() {
+        let plain = super::Artwork::Default.tray(64, false).unwrap();
+        let unread = super::Artwork::Default.tray(64, true).unwrap();
+        assert_eq!((plain.width, plain.height), (64, 64));
+        let blue = |pixel: &[u8]| pixel == [0x58, 0x65, 0xf2, 255];
+        let white = |pixel: &[u8]| pixel == [0xff, 0xff, 0xff, 255];
         let red = |pixel: &[u8]| pixel == [0xf0, 0x54, 0x5e, 255];
         assert!(
             plain
@@ -646,7 +651,15 @@ mod tests {
                 .as_chunks::<4>()
                 .0
                 .iter()
-                .any(|pixel| marigold(pixel))
+                .any(|pixel| blue(pixel))
+        );
+        assert!(
+            plain
+                .pixels
+                .as_chunks::<4>()
+                .0
+                .iter()
+                .any(|pixel| white(pixel))
         );
         assert!(
             !plain
@@ -662,10 +675,10 @@ mod tests {
                 .as_chunks::<4>()
                 .0
                 .iter()
-                .any(|pixel| marigold(pixel))
+                .any(|pixel| blue(pixel))
         );
         // The dot is in the bottom-right corner.
-        let corner = (24 * 32 + 24) * 4;
+        let corner = (50 * 64 + 50) * 4;
         assert!(red(&unread.pixels[corner..corner + 4]));
     }
 }

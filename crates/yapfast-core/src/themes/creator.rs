@@ -834,7 +834,7 @@ const PICTURE_SIDE: u32 = 1920;
 /// to at most 1920 pixels, re-encodes it as a JPEG under the themes' 2 MiB,
 /// and reads its colours.
 pub fn prepare_picture(bytes: &[u8]) -> Result<PreparedPicture, String> {
-    let refused = || "That file isn't a picture Yapfast can use".to_owned();
+    let refused = || "That file isn't a picture Discy can use".to_owned();
     let format = image::guess_format(bytes).map_err(|_| refused())?;
     let mut reader = image::ImageReader::with_format(std::io::Cursor::new(bytes), format);
     let mut limits = image::Limits::default();
@@ -1031,7 +1031,7 @@ pub struct FontFacts {
 }
 
 /// What a font that isn't one gets told.
-pub const NOT_A_FONT: &str = "That file isn't a font Yapfast can use";
+pub const NOT_A_FONT: &str = "That file isn't a font Discy can use";
 
 /// Checks a font the person chose, as a theme's fonts are checked, and reads
 /// its family, licence and how much of basic Latin it draws.
@@ -1044,7 +1044,7 @@ pub fn inspect_font(bytes: &[u8]) -> Result<FontFacts, String> {
     }
     check::check_font(bytes).map_err(|reason| {
         if reason.contains("Latin") {
-            "That font has no Latin letters, so Yapfast can't draw text with it".to_owned()
+            "That font has no Latin letters, so Discy can't draw text with it".to_owned()
         } else {
             NOT_A_FONT.to_owned()
         }
@@ -1364,7 +1364,7 @@ fn description(spec: &Spec) -> String {
         }
     }
     fonts.dedup();
-    let mut text = "Made with Yapfast's theme creator.".to_owned();
+    let mut text = "Made with Discy's theme creator.".to_owned();
     if !fonts.is_empty() {
         text.push_str(" Fonts: ");
         text.push_str(&fonts.join(", "));

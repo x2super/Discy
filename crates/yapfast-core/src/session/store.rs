@@ -10,7 +10,7 @@ use matrix_sdk::authentication::matrix::MatrixSession;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-const SERVICE: &str = "io.github.yapfast.Yapfast";
+const SERVICE: &str = "io.github.discy.Discy";
 
 #[derive(Clone, Copy, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
@@ -67,7 +67,7 @@ impl SessionStore {
             .open(lock_path)
             .context("could not open the session lock")?;
         lock.try_lock()
-            .context("another Yapfast process is using this session directory")?;
+            .context("another Discy process is using this session directory")?;
         Ok(Self { root, _lock: lock })
     }
 
@@ -82,7 +82,7 @@ impl SessionStore {
         let active: ActiveSession = serde_json::from_slice(&bytes)
             .context("session metadata is damaged; preserve the stores before repairing it")?;
         if active.version != 1 {
-            bail!("this session was written by an unsupported Yapfast version")
+            bail!("this session was written by an unsupported Discy version")
         }
         let bytes = match active.storage {
             SecretStorage::Keyring => entry(active.id)?.get_secret().map_err(|_| anyhow::anyhow!("session credentials are unavailable in the OS credential store; unlock it and retry"))?,

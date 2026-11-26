@@ -67,11 +67,17 @@ Escape closes it.
   people in, the link with Copy (Copied once copied), how long it lasts
   and how often it works, why it couldn't be made, and Expire after and
   Max number of uses, starting from the link's, for Generate a new link.
-- Join a Server, from the rail's button or a clicked invite link: the
-  field (Join's alone; Enter finds the invite), the server once found
-  with its icon and who is online, whether it is looking the invite up or
-  the account is in the server already, and Find Invite, Join in Browser
-  or Open Server; Join in Browser goes through the core to `browser.rs`.
+- Add a Server (from the rail's `+` button), Create a Server, and Join
+  a Server (or from a clicked invite link): `+` opens a choice between
+  Create a Server and Join a Server; Create a Server asks for a server
+  name (`POST /guilds`, with Back to return to the choice screen); Join
+  a Server takes an invite link or code and joins directly in-app on
+  Enter or Join Server (resolving and immediately posting to
+  `/invites/{code}`, with Back to return to the choice screen). A
+  clicked invite link opens Join a Server without the field, showing the
+  server's preview card, whether the account is already in the server,
+  and Open Server or Join Server (or Open in browser when a new-member
+  form is required, or Open the captcha again when Discord asks for one).
 - Create channel (Text or Voice) and Create category, in the server or
   the category the menu was for, Duplicate channel with its name to change,
   and Delete channel or category in red, which Delete Channel in the

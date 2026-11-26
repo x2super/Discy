@@ -85,11 +85,11 @@ mod windows {
     };
 
     const PROTOCOL: &str = r"Software\Classes\discord";
-    const YAPFAST_PROTOCOL: &str = r"Software\Classes\yapfast";
-    const YAPFAST_COMMAND: &str = r"Software\Classes\yapfast\shell\open\command";
-    const YAPFAST_ICON: &str = r"Software\Classes\yapfast\DefaultIcon";
+    const DISCY_PROTOCOL: &str = r"Software\Classes\discy";
+    const DISCY_COMMAND: &str = r"Software\Classes\discy\shell\open\command";
+    const DISCY_ICON: &str = r"Software\Classes\discy\DefaultIcon";
     const COMMAND: &str = r"Software\Classes\discord\shell\open\command";
-    const BACKUP: &str = r"Software\Yapfast\DiscordProtocol";
+    const BACKUP: &str = r"Software\Discy\DiscordProtocol";
     const PREVIOUS_COMMAND: &str = "PreviousCommand";
     const HAD_COMMAND: &str = "HadCommand";
     const HAD_URL_PROTOCOL: &str = "HadUrlProtocol";
@@ -127,7 +127,7 @@ mod windows {
                         },
                     )?;
                 }
-                register_yapfast(root, &ours)?;
+                register_discy(root, &ours)?;
                 if query_string(PROTOCOL, Some("URL Protocol")).is_none() {
                     set_string(PROTOCOL, Some("URL Protocol"), "")?;
                 }
@@ -161,27 +161,27 @@ mod windows {
             && query_string(COMMAND, None).as_deref().is_some_and(is_ours)
         {
             let ours = command_line(&super::command(root)?);
-            register_yapfast(root, &ours)?;
+            register_discy(root, &ours)?;
             set_string(COMMAND, None, &ours)?;
         }
         Ok(())
     }
 
-    /// Registers Yapfast's own scheme for this copy, as the installer
-    /// does, so a portable copy can be handed `yapfast:` links too.
-    fn register_yapfast(root: &Path, ours: &str) -> io::Result<()> {
-        set_string(YAPFAST_PROTOCOL, None, "URL:Yapfast Protocol")?;
-        set_string(YAPFAST_PROTOCOL, Some("URL Protocol"), "")?;
+    /// Registers Discy's own scheme for this copy, as the installer
+    /// does, so a portable copy can be handed `discy:` links too.
+    fn register_discy(root: &Path, ours: &str) -> io::Result<()> {
+        set_string(DISCY_PROTOCOL, None, "URL:Discy Protocol")?;
+        set_string(DISCY_PROTOCOL, Some("URL Protocol"), "")?;
         let program = super::command(root)?
             .into_iter()
             .next()
-            .ok_or_else(|| io::Error::other("Yapfast's own path is unavailable"))?;
+            .ok_or_else(|| io::Error::other("Discy's own path is unavailable"))?;
         set_string(
-            YAPFAST_ICON,
+            DISCY_ICON,
             None,
             &format!("{},0", crate::autostart::windows_argument(&program)),
         )?;
-        set_string(YAPFAST_COMMAND, None, ours)
+        set_string(DISCY_COMMAND, None, ours)
     }
 
     /// The registered command line, with the link last, after
@@ -206,7 +206,7 @@ mod windows {
     /// with or without `--open-link`, as earlier builds registered it.
     fn is_ours(command: &str) -> bool {
         let command = command.to_ascii_lowercase();
-        command.contains("yapfast.exe") && command.contains("%1")
+        (command.contains("discy.exe") || command.contains("yapfast.exe")) && command.contains("%1")
     }
 
     pub(crate) fn set_string(key: &str, name: Option<&str>, value: &str) -> io::Result<()> {
@@ -329,12 +329,12 @@ mod windows {
 
         #[test]
         fn recognises_its_own_registered_command() {
-            assert!(is_ours(r#""C:\Apps\Yapfast\yapfast.exe" --open-link "%1""#));
+            assert!(is_ours(r#""C:\Apps\Discy\discy.exe" --open-link "%1""#));
             assert!(is_ours(r#""C:\Apps\Yapfast\yapfast.exe" "%1""#));
             assert!(!is_ours(r#""C:\Apps\Discord\Discord.exe" "%1""#));
             assert_eq!(
-                command_line(&[r"C:\Apps\Yapfast\yapfast.exe".into()]),
-                r#""C:\Apps\Yapfast\yapfast.exe" --open-link "%1""#
+                command_line(&[r"C:\Apps\Discy\discy.exe".into()]),
+                r#""C:\Apps\Discy\discy.exe" --open-link "%1""#
             );
         }
 
@@ -389,7 +389,7 @@ mod linux {
         if enabled {
             desktop_entry::install();
             if !desktop_exists() {
-                return Err(io::Error::other("Yapfast's desktop entry isn't installed"));
+                return Err(io::Error::other("Discy's desktop entry isn't installed"));
             }
         }
         apply(&list, &root.join(PREVIOUS), enabled)

@@ -790,7 +790,7 @@ impl Matrix {
                 if !found {
                     let _ = events.send(Event::RoomError {
                         room: room.clone(),
-                        message: "Yapfast couldn't find that message.".into(),
+                        message: "Discy couldn't find that message.".into(),
                     });
                 }
                 // Said before the window is published; see Command::Around.
@@ -1402,13 +1402,13 @@ async fn send(
                     .room()
                     .make_reply_event(content, reply)
                     .await
-                    .map_err(|_| "Yapfast could not find the message to reply to.")?;
+                    .map_err(|_| "Discy could not find the message to reply to.")?;
                 timeline.send(content.into()).await
             }
         }
         None => timeline.send(content.with_relation(None).into()).await,
     };
-    queued.map_err(|_| "Yapfast could not queue this message. Your draft is kept.")?;
+    queued.map_err(|_| "Discy could not queue this message. Your draft is kept.")?;
     // The queue owns the message now, including across restarts.
     let _ = timeline.room().clear_composer_draft(None).await;
     Ok(())
@@ -1471,7 +1471,7 @@ async fn forward(
         .map(|_| ())
         .map_err(|_| {
             ForwardFailure::Note(
-                "Yapfast could not queue the message you added. Check your connection.".into(),
+                "Discy could not queue the message you added. Check your connection.".into(),
             )
         })
 }
@@ -1520,7 +1520,7 @@ async fn forward_message(
         .send(RoomMessageEventContent::new(content).into())
         .await
         .map_err(
-            |_| "Yapfast could not queue the forwarded message. Check your connection and retry.",
+            |_| "Discy could not queue the forwarded message. Check your connection and retry.",
         )?;
     Ok(target)
 }
@@ -1568,7 +1568,7 @@ async fn attach(
     let timeline = writable(session, open, room).await?;
     let metadata = tokio::fs::metadata(path)
         .await
-        .map_err(|_| "Yapfast could not read that file.")?;
+        .map_err(|_| "Discy could not read that file.")?;
     if !metadata.is_file() {
         return Err("Choose a file to send.");
     }
@@ -1613,7 +1613,7 @@ async fn attach(
         )
         .use_send_queue()
         .await
-        .map_err(|_| "Yapfast could not queue that file. Check that it is readable and retry.")
+        .map_err(|_| "Discy could not queue that file. Check that it is readable and retry.")
 }
 
 /// The media source and display name of an item's attachment.
@@ -1685,12 +1685,12 @@ async fn view_image(
                     .ok()
                     .flatten()
                     .map(Arc::new)
-                    .ok_or("Yapfast can't show this image. Save it to open it elsewhere."),
+                    .ok_or("Discy can't show this image. Save it to open it elsewhere."),
                 Err(matrix_media::Failed::TooLarge) => {
                     Err("This image is too large to show here. Save it to open it elsewhere.")
                 }
                 Err(_) => Err(
-                    "Yapfast couldn't download this image. Check your connection and try again.",
+                    "Discy couldn't download this image. Check your connection and try again.",
                 ),
             };
         let _ = events.send(Event::Image {
@@ -1724,12 +1724,12 @@ async fn save_attachment(
     matrix_media::save(client, &source, MAX_SAVE_BYTES, path)
         .await
         .map_err(|failed| match failed {
-            matrix_media::Failed::TooLarge => "This file is larger than Yapfast saves.",
+            matrix_media::Failed::TooLarge => "This file is larger than Discy saves.",
             matrix_media::Failed::Write => {
-                "Yapfast could not write the file there. Choose another folder."
+                "Discy could not write the file there. Choose another folder."
             }
             matrix_media::Failed::Download | matrix_media::Failed::Decrypt => {
-                "Yapfast could not download or decrypt this file. Check your connection and retry."
+                "Discy could not download or decrypt this file. Check your connection and retry."
             }
         })
 }

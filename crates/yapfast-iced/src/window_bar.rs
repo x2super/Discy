@@ -832,7 +832,7 @@ pub fn window_bar(app: &App) -> Option<Element<'_, Message>> {
     let state = app.client.state();
     let settings_open = app.win.settings.is_open();
     let place = if !workspace {
-        "Yapfast".to_owned()
+        "Discy".to_owned()
     } else if app.sidebar.header.server.is_none() {
         "Direct Messages".to_owned()
     } else {

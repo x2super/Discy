@@ -290,14 +290,7 @@ pub fn view<'a>(cx: Ctx<'a>) -> Element<'a, Message> {
         discord_form(cx)
     };
     let divider = bar(theme.line, 1, Length::Fill);
-    let mark = cx
-        .look
-        .glyph(Icon::Logo, 44, theme.accent)
-        .boxed(72)
-        .style({
-            let raised = theme.raised;
-            move |_| rounded(raised, 24)
-        });
+    let mark = cx.look.drawn(Icon::Logo, 72);
     let preview = column![
         mark,
         text("Just looking?")
@@ -357,7 +350,7 @@ pub fn view<'a>(cx: Ctx<'a>) -> Element<'a, Message> {
     )
     .style(scrollbar(theme))
     .height(Length::Fill);
-    let wordmark = container(text("Yapfast").size(24).font(BOLD).color(theme.accent))
+    let wordmark = container(text("Discy").size(24).font(BOLD).color(theme.accent))
         .padding(Padding {
             top: 24.0,
             right: 0.0,
@@ -377,7 +370,7 @@ fn discord_form<'a>(cx: Ctx<'a>) -> Element<'a, Message> {
     let theme = cx.look.theme;
     let state = cx.state;
     let mut form = column![
-        title(theme, "Sign in to Yapfast"),
+        title(theme, "Sign in to Discy"),
         text("Link your Discord account with your phone.")
             .color(theme.secondary)
             .align_x(Alignment::Center)
@@ -419,7 +412,7 @@ pub(crate) fn link_panel<'a>(ctx: crate::ctx::Ctx<'a>) -> Element<'a, Message> {
                 row![
                     ctx.look.glyph(Icon::TriangleAlert, 18, theme.danger),
                     text(
-                        "Discord doesn't allow apps like Yapfast on personal accounts. \
+                        "Discord doesn't allow apps like Discy on personal accounts. \
                          Linking puts your account at some risk of being suspended."
                     )
                     .size(14)
@@ -444,7 +437,7 @@ pub(crate) fn link_panel<'a>(ctx: crate::ctx::Ctx<'a>) -> Element<'a, Message> {
             if ctx.state.discord_session_kept {
                 panel = panel.push(
                     text(
-                        "Yapfast forgot your login on this computer. If you pasted a \
+                        "Discy forgot your login on this computer. If you pasted a \
                          token, the app or browser you copied it from is still signed in.",
                     )
                     .size(14)
@@ -527,7 +520,7 @@ pub(crate) fn link_panel<'a>(ctx: crate::ctx::Ctx<'a>) -> Element<'a, Message> {
                 .color(theme.text),
             text(
                 "Discord wants to check you're a person before it links your account. \
-                 Yapfast opened the check in your browser; linking finishes once it's \
+                 Discy opened the check in your browser; linking finishes once it's \
                  solved."
             )
             .size(14)
@@ -621,7 +614,7 @@ fn matrix_form<'a>(cx: Ctx<'a>) -> Element<'a, Message> {
             .on_submit(Message::SignIn(Event::Login));
     }
     let mut form = column![
-        title(theme, "Sign in to Yapfast"),
+        title(theme, "Sign in to Discy"),
         text("Use your existing Matrix account.")
             .color(theme.secondary)
             .align_x(Alignment::Center)
@@ -719,7 +712,7 @@ pub fn verify_banner<'a>(cx: Ctx<'a>) -> Option<Element<'a, Message>> {
                         .font(BOLD)
                         .color(theme.text),
                     text(
-                        "Use your Matrix recovery key, or verify Yapfast in another client \
+                        "Use your Matrix recovery key, or verify Discy in another client \
                          and check again."
                     )
                     .size(14)

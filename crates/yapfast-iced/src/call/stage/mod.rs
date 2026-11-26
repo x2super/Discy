@@ -490,7 +490,7 @@ fn join_view(app: &App) -> Element<'_, Message> {
             .is_some_and(|room| room.call_encrypted());
     if !encrypted {
         panel = panel.push(
-            text("This channel is unencrypted. Yapfast only joins encrypted voice channels.")
+            text("This channel is unencrypted. Discy only joins encrypted voice channels.")
                 .size(15)
                 .color(theme.accent)
                 .align_x(Alignment::Center),

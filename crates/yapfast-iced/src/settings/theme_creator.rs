@@ -339,7 +339,7 @@ fn prepare_picture(generation: u64, path: PathBuf) -> Task<Message> {
         async move {
             tokio::task::spawn_blocking(move || {
                 let bytes = std::fs::read(path)
-                    .map_err(|_| "That file isn't a picture Yapfast can use".to_owned())?;
+                    .map_err(|_| "That file isn't a picture Discy can use".to_owned())?;
                 PictureArrival::prepare(&bytes)
             })
             .await
@@ -1471,7 +1471,7 @@ impl<'a> Page<'a> {
                 self.creator_preview(creator, width),
                 form::note(
                     theme,
-                    "Yapfast itself wears the theme while you make it, behind these settings.",
+                    "Discy itself wears the theme while you make it, behind these settings.",
                 ),
             ];
             if let Some((note, moved)) = creator.readable() {
@@ -2073,7 +2073,7 @@ impl<'a> Page<'a> {
                 "OR FROM A PICTURE",
                 picture_controls,
                 bad.is_none().then(|| {
-                    "The picture goes behind Yapfast, and its colours become the theme's.".into()
+                    "The picture goes behind Discy, and its colours become the theme's.".into()
                 }),
             ),
         ]
@@ -2550,7 +2550,7 @@ impl<'a> Page<'a> {
         .spacing(8);
         let corners_word = match spec.corners {
             0 => "Square",
-            50 => "Yapfast's own",
+            50 => "Discy's own",
             100 => "Round",
             under if under < 50 => "Sharper",
             _ => "Rounder",

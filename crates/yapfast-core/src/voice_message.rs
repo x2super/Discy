@@ -148,7 +148,7 @@ impl Player {
                         "could not download a voice message"
                     );
                     let _ = reported.send(Report::Failed(
-                        "Yapfast couldn't download this voice message.",
+                        "Discy couldn't download this voice message.",
                     ));
                     return;
                 }
@@ -288,7 +288,7 @@ fn play_on(
                     error = format!("{error:#}"),
                     "could not play a voice message"
                 );
-                let _ = reports.send(Report::Failed("Yapfast couldn't play this voice message."));
+                let _ = reports.send(Report::Failed("Discy couldn't play this voice message."));
                 return;
             }
         }
@@ -318,7 +318,7 @@ fn play(
     reports: &UnboundedSender<Report>,
     paused_at: Option<u64>,
 ) -> Result<bool> {
-    let mut file = Video::open_sound(Cursor::new(data)).context("not a sound Yapfast can play")?;
+    let mut file = Video::open_sound(Cursor::new(data)).context("not a sound Discy can play")?;
     let (rate, channels) = file.sound.context("the file has no sound")?;
     let mut resampler = Resampler::new(rate, channels);
     let mut tempo = Tempo::new();

@@ -1750,7 +1750,7 @@ fn running_yapfast() -> Result<PathBuf> {
     if cfg!(target_os = "linux") {
         return Ok(PathBuf::from("/proc/self/exe"));
     }
-    std::env::current_exe().context("could not find Yapfast to start streaming")
+    std::env::current_exe().context("could not find Discy to start streaming")
 }
 
 /// What a worker's reports last said about its job, to log if it ends

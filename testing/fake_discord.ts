@@ -7954,6 +7954,72 @@ async function api(req: Request, path: string, origin: string): Promise<Response
     inviteForm = false;
     return json({ ...invite, new_member: newMember, show_verification_form: form });
   }
+  if (method === "POST" && path === "/guilds") {
+    const body: any = await req.json().catch(() => ({}));
+    const name = typeof body.name === "string" ? body.name.trim() : "";
+    if (name.length < 2 || name.length > 100) {
+      return json({
+        message: "Invalid Form Body",
+        code: 50035,
+        errors: { name: { _errors: [{ code: "BASE_TYPE_BAD_LENGTH", message: "Must be between 2 and 100 in length." }] } },
+      }, 400);
+    }
+    const id = nextId(Date.now());
+    const generalId = nextId(Date.now() + 1);
+    const channels = [guildChannel(generalId, "general", 0, 0, null, id)];
+    const roles = [serverRole(id, "@everyone", EVERYONE, 0)];
+    const properties = {
+      ...guild().properties,
+      id,
+      name,
+      owner_id: ALICE,
+      icon: null,
+      banner: null,
+      splash: null,
+      description: null,
+      features: [],
+      verification_level: 0,
+      default_message_notifications: 0,
+      explicit_content_filter: 0,
+      mfa_level: 0,
+      premium_tier: 0,
+      premium_features: {
+        features: [],
+        additional_emoji_slots: 0,
+        additional_sticker_slots: 0,
+        additional_sound_slots: 0,
+      },
+      premium_progress_bar_enabled: false,
+      system_channel_id: null,
+      system_channel_flags: 0,
+      afk_channel_id: null,
+      afk_timeout: 300,
+      incidents_data: null,
+    };
+    dispatch("GUILD_CREATE", {
+      id,
+      properties,
+      channels,
+      roles,
+      emojis: [],
+      stickers: [],
+      threads: [],
+      stage_instances: [],
+      guild_scheduled_events: [],
+      activity_instances: [],
+      member_count: 1,
+      joined_at: new Date().toISOString(),
+      large: false,
+      lazy: true,
+      premium_subscription_count: 0,
+      data_mode: "full",
+      version: 1,
+      members: [member(users.alice, [])],
+      voice_states: [],
+      presences: [],
+    });
+    return json({ id, name, owner_id: ALICE, icon: null, roles, channels }, 201);
+  }
 
   // The scheduled event in "Server"'s Lounge, from its link, and Alice's
   // interest in it: marking it fires the gateway event Discord sends.

@@ -165,7 +165,7 @@ pub struct TooManyIdentifies;
 
 impl std::fmt::Display for TooManyIdentifies {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str("Yapfast started too many Discord gateway sessions within the hour")
+        f.write_str("Discy started too many Discord gateway sessions within the hour")
     }
 }
 
@@ -556,7 +556,7 @@ impl Gateway {
         tracing::warn!(
             ?opcode,
             wait,
-            "Discord's gateway asked Yapfast to slow down"
+            "Discord's gateway asked Discy to slow down"
         );
         if opcode != Some(REQUEST_GUILD_MEMBERS) {
             return;

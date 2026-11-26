@@ -57,7 +57,7 @@ fn client() -> Result<reqwest::Client, String> {
                 .install_default()
                 .ok();
             reqwest::Client::builder()
-                .user_agent(concat!("Yapfast/", env!("CARGO_PKG_VERSION")))
+                .user_agent(concat!("Discy/", env!("CARGO_PKG_VERSION")))
                 .https_only(true)
                 .redirect(reqwest::redirect::Policy::custom(|attempt| {
                     let github = attempt

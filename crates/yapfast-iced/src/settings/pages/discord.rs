@@ -24,7 +24,7 @@ impl<'a> Page<'a> {
                 form::title(theme, "Discord"),
                 form::note(
                     theme,
-                    "Link your Discord account to see its servers and DMs in Yapfast, and join its calls. The login stays on this computer, in the system's credential store.",
+                    "Link your Discord account to see its servers and DMs in Discy, and join its calls. The login stays on this computer, in the system's credential store.",
                 ),
                 crate::signin::link_panel(self.cx),
             ]);
@@ -36,7 +36,7 @@ impl<'a> Page<'a> {
             parts.push(form::beside(
                 form::note(
                     theme,
-                    "Unlinking signs Yapfast out of Discord on this computer.",
+                    "Unlinking signs Discy out of Discord on this computer.",
                 ),
                 action(
                     theme,
@@ -59,13 +59,13 @@ impl<'a> Page<'a> {
         ));
         parts.push(self.flip(
             "Mark messages read on Discord",
-            "Channels you read in Yapfast show as read in the Discord apps too.",
+            "Channels you read in Discy show as read in the Discord apps too.",
             prefs.sync_discord_reads.unwrap_or(true),
             Pref::SyncReads,
         ));
         parts.push(self.flip(
             "Show me as idle when I'm away",
-            "After 10 minutes without using Yapfast, as in Discord. Either way, your phone gets notifications while you're away.",
+            "After 10 minutes without using Discy, as in Discord. Either way, your phone gets notifications while you're away.",
             prefs.show_idle.unwrap_or(true),
             Pref::ShowIdle,
         ));

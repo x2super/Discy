@@ -470,7 +470,7 @@ impl<'a> View<'a> {
         let note = match &role.members {
             None => Some("Loading..."),
             Some(members) if members.is_empty() => {
-                Some("Yapfast hasn't seen anyone with this role yet.")
+                Some("Discy hasn't seen anyone with this role yet.")
             }
             Some(_) => None,
         };

@@ -343,18 +343,18 @@ fn an_installed_theme_applies_and_turns_off_from_themes() {
     assert!(shows(&app, "by Ada, Lin · v1.0.0"));
     assert!(shows(&app, "Dark and light"), "its tag");
     // The package's ignored-field note is retained and shown verbatim.
-    let ignored = "\"future_sparkle\" isn't something this Yapfast reads; ignored";
+    let ignored = "\"future_sparkle\" isn't something this Discy reads; ignored";
     assert!(
         app.themes.installed[0]
             .notes
             .iter()
             .any(|note| note == ignored)
     );
-    // What this Yapfast leaves out shows with the rest of the cost.
+    // What this Discy leaves out shows with the rest of the cost.
     interact(&mut app, |ui| {
         ui.click("Details").expect("Details");
     });
-    assert!(shows(&app, "Left out by this Yapfast"));
+    assert!(shows(&app, "Left out by this Discy"));
     assert!(shows(&app, ignored));
     interact(&mut app, |ui| {
         ui.click("Apply").expect("Apply");
@@ -1221,7 +1221,7 @@ fn a_custom_theme_is_exported_from_the_editor_and_imported_by_another_install() 
     let _ = other.update(theme(ThemeEvent::Pasted(None)));
     assert!(shows(&other, "The clipboard holds no text."));
     let _ = other.update(theme(ThemeEvent::Pasted(Some("hello".into()))));
-    assert!(shows(&other, "That is not a Yapfast theme."));
+    assert!(shows(&other, "That is not a Discy theme."));
     assert_eq!(other.themes.custom.len(), 3);
 
     // A file that isn't a theme, or can't be read, changes nothing but the
@@ -1229,7 +1229,7 @@ fn a_custom_theme_is_exported_from_the_editor_and_imported_by_another_install() 
     let junk = files.path().join("junk.json");
     std::fs::write(&junk, "{}").expect("the file");
     let _ = other.update(theme(ThemeEvent::Imported(junk)));
-    assert!(shows(&other, "That is not a Yapfast theme."));
+    assert!(shows(&other, "That is not a Discy theme."));
     assert_eq!(note(&other).map(|(_, wrong)| wrong), Some(true));
     let missing = files.path().join("missing.json");
     let _ = other.update(theme(ThemeEvent::Imported(missing)));
@@ -1640,7 +1640,7 @@ fn a_recorded_push_to_talk_key_is_named_and_kept() {
     open(&mut app, Section::Voice);
     assert!(shows(
         &app,
-        "Your desktop has no global keys, so push to talk works only while Yapfast's window is in front."
+        "Your desktop has no global keys, so push to talk works only while Discy's window is in front."
     ));
     let again = start(&folder, true);
     assert_eq!(
@@ -1940,7 +1940,7 @@ fn a_file_that_is_no_font_is_left_out_of_appearances_font() {
     assert!(
         shows(
             &app,
-            "notes.ttf: Not a font file. Yapfast reads TTF, OTF, TTC and WOFF."
+            "notes.ttf: Not a font file. Discy reads TTF, OTF, TTC and WOFF."
         ),
         "the note names the file and says why"
     );
@@ -1951,7 +1951,7 @@ fn a_file_that_is_no_font_is_left_out_of_appearances_font() {
     let _ = app.update(font_message(FontEvent::Reset));
     assert!(!shows(
         &app,
-        "notes.ttf: Not a font file. Yapfast reads TTF, OTF, TTC and WOFF."
+        "notes.ttf: Not a font file. Discy reads TTF, OTF, TTC and WOFF."
     ));
 }
 

@@ -109,9 +109,9 @@ pub fn init_tls() -> anyhow::Result<()> {
         .map_err(|_| anyhow::anyhow!("could not initialize the TLS provider"))
 }
 
-/// Where Yapfast keeps its sessions and local settings unless given --data-dir.
+/// Where Discy keeps its sessions and local settings unless given --data-dir.
 pub fn default_directory() -> anyhow::Result<std::path::PathBuf> {
-    directories::ProjectDirs::from("io.github", "yapfast", "Yapfast")
+    directories::ProjectDirs::from("io.github", "discy", "Discy")
         .map(|dirs| dirs.data_local_dir().to_owned())
         .context("could not find an application data directory; pass --data-dir")
 }

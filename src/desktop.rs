@@ -490,7 +490,7 @@ fn install_offer(release: &Release) -> (bool, String) {
             let megabytes = target.asset().size.div_ceil(1_000_000);
             (
                 true,
-                format!("{megabytes} MB. Yapfast restarts when it's done."),
+                format!("{megabytes} MB. Discy restarts when it's done."),
             )
         }
         Err(_) if update::source().manager().is_some() => (false, String::new()),

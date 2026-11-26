@@ -67,7 +67,7 @@ fn pack_twemoji() {
         .collect();
     let font = emoji_font_tables::build_joined(
         &emoji_font_tables::TWEMOJI,
-        "Yapfast Twemoji",
+        "Discy Twemoji",
         &glyphs,
         &also,
         &joins,

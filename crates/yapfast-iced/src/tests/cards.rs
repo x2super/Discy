@@ -39,7 +39,7 @@ fn a_role_mentions_card_lists_its_people_who_open_their_own() {
     role.members = Some(vec![]);
     assert!(shows(
         &app,
-        "Yapfast hasn't seen anyone with this role yet."
+        "Discy hasn't seen anyone with this role yet."
     ));
     app.client.app.state.role.as_mut().expect("open").members = Some(vec![riley]);
     assert!(shows(&app, "@Mods"));
@@ -364,7 +364,7 @@ fn an_activitys_buttons_show_on_the_card_and_ask_before_opening_their_link() {
     });
     let _ = app.sync();
     assert_eq!(app.leaving.as_deref(), Some("https://mods.factorio.com/"));
-    assert!(shows(&app, "Leaving Yapfast"));
+    assert!(shows(&app, "Leaving Discy"));
     let _ = app.update(Message::Dialog(crate::dialogs::Event::Leave(false)));
     assert_eq!(app.leaving, None);
     // The other button's address came with that answer: nothing more is
@@ -373,7 +373,7 @@ fn an_activitys_buttons_show_on_the_card_and_ask_before_opening_their_link() {
         ui.click("Join the factory").expect("its button");
     });
     assert_eq!(app.leaving.as_deref(), Some("https://factorio.com/"));
-    assert!(shows(&app, "Leaving Yapfast"));
+    assert!(shows(&app, "Leaving Discy"));
     assert_eq!(asked(&app), 1, "no second request");
 }
 

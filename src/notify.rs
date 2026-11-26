@@ -139,7 +139,7 @@ mod linux {
             }
             let actions = ["default", "Open"];
             let request = (
-                "Yapfast",
+                "Discy",
                 0u32,
                 "",
                 alert.title.as_str(),
@@ -354,18 +354,18 @@ mod windows {
     fn register(folder: &Path) -> anyhow::Result<ToastNotifier> {
         std::fs::create_dir_all(folder).context("making the notifications folder")?;
         let icon = folder.join("icon.png");
-        let png = super::icon_png().context("Yapfast's icon has no 256-pixel picture")?;
+        let png = super::icon_png().context("Discy's icon has no 256-pixel picture")?;
         if std::fs::read(&icon).ok().as_deref() != Some(png) {
             std::fs::write(&icon, png).context("writing the notification icon")?;
         }
         let key = format!(r"Software\Classes\AppUserModelId\{}", crate::icon::APP_ID);
-        crate::protocol::set_string(&key, Some("DisplayName"), "Yapfast")
-            .context("registering Yapfast's name")?;
+        crate::protocol::set_string(&key, Some("DisplayName"), "Discy")
+            .context("registering Discy's name")?;
         let icon = icon
             .to_str()
             .context("the data folder's path isn't Unicode")?;
         crate::protocol::set_string(&key, Some("IconUri"), icon)
-            .context("registering Yapfast's icon")?;
+            .context("registering Discy's icon")?;
         ToastNotificationManager::CreateToastNotifierWithId(&HSTRING::from(crate::icon::APP_ID))
             .context("starting toasts")
     }

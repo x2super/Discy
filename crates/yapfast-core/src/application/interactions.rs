@@ -933,7 +933,7 @@ impl Application {
             self.command_answered(nonce, None, false);
         }
         let Some(mut modal) = InteractionModal::parse(raw) else {
-            self.state.notice = Some("Yapfast couldn't show this app's form.".into());
+            self.state.notice = Some("Discy couldn't show this app's form.".into());
             return;
         };
         if modal.guild_id.is_none() {
@@ -1336,7 +1336,7 @@ mod tests {
         assert!(app.state.interaction_modal.is_none());
         assert_eq!(
             app.state.notice.as_deref(),
-            Some("Yapfast couldn't show this app's form.")
+            Some("Discy couldn't show this app's form.")
         );
         assert!(app.state.interactions.pending.is_empty());
     }

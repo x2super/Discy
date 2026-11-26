@@ -135,7 +135,7 @@ pub fn open(file: &Path, key: &Key) -> std::io::Result<(String, Opening<std::fs:
     let (login, prefix) = rest.split_at(LOGIN);
     let invalid = |why| std::io::Error::new(std::io::ErrorKind::InvalidData, why);
     if magic != MAGIC {
-        return Err(invalid("not a file Yapfast encrypted"));
+        return Err(invalid("not a file Discy encrypted"));
     }
     let size = input.metadata()?.len();
     let (length, chunks) = chunks(size).ok_or_else(|| invalid("cut short"))?;

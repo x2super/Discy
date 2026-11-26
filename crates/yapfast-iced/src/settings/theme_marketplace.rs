@@ -781,7 +781,7 @@ impl Marketplace {
                 kit::step(
                     look,
                     Icon::Download,
-                    "Yapfast fetches the theme",
+                    "Discy fetches the theme",
                     "Straight from its repository, at the commit it's at now.",
                 ),
                 kit::step(
@@ -953,7 +953,7 @@ impl Marketplace {
                         Some(Event::ReviewNotify(!review.notify_on)),
                     )
                     .description(
-                        "Its sounds for messages, mentions, calls and the rest, in place of Yapfast's.",
+                        "Its sounds for messages, mentions, calls and the rest, in place of Discy's.",
                     )
                     .view(look),
                 );
@@ -966,7 +966,7 @@ impl Marketplace {
                         Some(Event::ReviewInterface(!review.interface_on)),
                     )
                     .description(
-                        "Only while Yapfast is in front. You can change both later in Settings → Themes.",
+                        "Only while Discy is in front. You can change both later in Settings → Themes.",
                     )
                     .view(look),
                 );
@@ -1170,7 +1170,7 @@ pub(super) fn cost_line<'a, M: Clone + 'a>(
         detail = detail.push(part(label.clone(), value.clone()));
     }
     if !notes.is_empty() {
-        detail = detail.push(part("Left out by this Yapfast".into(), format_notes(notes)));
+        detail = detail.push(part("Left out by this Discy".into(), format_notes(notes)));
     }
     let sunken = theme.sunken;
     column![

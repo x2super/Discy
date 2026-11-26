@@ -11,7 +11,7 @@ pub const SUPPORTED: bool = cfg!(any(target_os = "linux", windows));
 /// The name the entry goes by: the Run key's value, and the Inno Setup
 /// installer's, which writes the same one.
 #[cfg(windows)]
-const NAME: &str = "Yapfast";
+const NAME: &str = "Discy";
 
 /// Whether Yapfast starts when the person signs in.
 pub fn enabled() -> bool {
@@ -166,8 +166,8 @@ mod linux {
             .map(|argument| desktop_entry::quoted(argument))
             .collect();
         let text = format!(
-            "[Desktop Entry]\nType=Application\nName=Yapfast\n\
-             Comment=Starts Yapfast in the system tray when you sign in\n\
+            "[Desktop Entry]\nType=Application\nName=Discy\n\
+             Comment=Starts Discy in the system tray when you sign in\n\
              Exec={}\nIcon={}\nTerminal=false\nX-GNOME-Autostart-enabled=true\n",
             exec.join(" "),
             crate::icon::APP_ID,
@@ -184,7 +184,7 @@ mod linux {
             let config = tempfile::tempdir().unwrap();
             assert!(!entry_enabled(config.path()));
             let command = [
-                "/opt/Yapfast Builds/yapfast".to_owned(),
+                "/opt/Discy Builds/discy".to_owned(),
                 "--background".to_owned(),
                 "--data-dir".to_owned(),
                 "/home/a/100% $data".to_owned(),
@@ -193,9 +193,9 @@ mod linux {
             assert!(entry_enabled(config.path()));
             let text = std::fs::read_to_string(entry(config.path())).unwrap();
             assert!(text.contains(
-                r#"Exec="/opt/Yapfast Builds/yapfast" --background --data-dir "/home/a/100%% \$data""#
+                r#"Exec="/opt/Discy Builds/discy" --background --data-dir "/home/a/100%% \$data""#
             ));
-            assert!(text.contains("Name=Yapfast\n"));
+            assert!(text.contains("Name=Discy\n"));
         }
 
         #[test]
@@ -411,8 +411,8 @@ mod tests {
     fn quotes_windows_arguments_as_windows_splits_them() {
         assert_eq!(windows_argument("--background"), "--background");
         assert_eq!(
-            windows_argument(r"C:\Users\A B\Yapfast\yapfast.exe"),
-            r#""C:\Users\A B\Yapfast\yapfast.exe""#
+            windows_argument(r"C:\Users\A B\Discy\discy.exe"),
+            r#""C:\Users\A B\Discy\discy.exe""#
         );
         assert_eq!(windows_argument(r"C:\A B\"), r#""C:\A B\\""#);
         assert_eq!(windows_argument(r#"say "hi""#), r#""say \"hi\"""#);
@@ -422,12 +422,12 @@ mod tests {
     #[test]
     fn quotes_a_program_whether_or_not_it_needs_it() {
         assert_eq!(
-            windows_program(r"C:\Apps\Yapfast\yapfast.exe"),
-            r#""C:\Apps\Yapfast\yapfast.exe""#
+            windows_program(r"C:\Apps\Discy\discy.exe"),
+            r#""C:\Apps\Discy\discy.exe""#
         );
         assert_eq!(
-            windows_program(r"C:\A B\yapfast.exe"),
-            r#""C:\A B\yapfast.exe""#
+            windows_program(r"C:\A B\discy.exe"),
+            r#""C:\A B\discy.exe""#
         );
     }
 }

@@ -239,7 +239,7 @@ impl AppState {
                     lines.push(format!("Afterward, Discord sends you to {host}."));
                 }
                 Some(url) => lines.push(format!(
-                    "Afterward, Discord hands its answer to {url}, which Yapfast won't open."
+                    "Afterward, Discord hands its answer to {url}, which Discy won't open."
                 )),
                 None => {}
             }
@@ -278,7 +278,7 @@ impl AppState {
             "Authorizing..."
         } else if dialog.done && dialog.next.is_some() {
             "Authorized. Discord sends you on to this address, which isn't a web page, \
-             so Yapfast doesn't open it. Copy it if the app asks for it."
+             so Discy doesn't open it. Copy it if the app asks for it."
         } else if dialog.done {
             "Authorized."
         } else if !locked
@@ -336,8 +336,8 @@ pub fn permission_names(bits: u64) -> String {
     let more = (bits & !named).count_ones();
     let more = match (more, names.is_empty()) {
         (0, _) => None,
-        (1, true) => Some("1 permission Yapfast can't name".to_owned()),
-        (count, true) => Some(format!("{count} permissions Yapfast can't name")),
+        (1, true) => Some("1 permission Discy can't name".to_owned()),
+        (count, true) => Some(format!("{count} permissions Discy can't name")),
         (1, false) => Some("1 more permission".to_owned()),
         (count, false) => Some(format!("{count} more permissions")),
     };

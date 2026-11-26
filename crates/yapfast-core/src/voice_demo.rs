@@ -78,7 +78,7 @@ pub async fn provision() -> Result<PathBuf> {
         channels.push(room.room_id().to_owned());
     }
     let mut request = create_room::v3::Request::new();
-    request.name = Some("Yapfast voice test".into());
+    request.name = Some("Discy voice test".into());
     request.creation_content = Some(Raw::from_json_string(
         json!({"type":"m.space"}).to_string(),
     )?);
@@ -116,7 +116,7 @@ pub async fn provision() -> Result<PathBuf> {
         root.join("bob").display()
     );
     println!(
-        "Select Yapfast voice test, then Lounge, and Join voice. Both join with the microphone on; \
+        "Select Discy voice test, then Lounge, and Join voice. Both join with the microphone on; \
          mute one, or use headphones."
     );
     Ok(root)

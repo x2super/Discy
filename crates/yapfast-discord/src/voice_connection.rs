@@ -41,7 +41,7 @@ fn gateway_url(endpoint: &str) -> Result<reqwest::Url> {
         return match url.host() {
             Some(url::Host::Ipv4(ip)) if ip.is_loopback() => Ok(url),
             Some(url::Host::Domain("localhost")) => Ok(url),
-            _ => bail!("Discord gave a voice server Yapfast won't connect to"),
+            _ => bail!("Discord gave a voice server Discy won't connect to"),
         };
     }
     Ok(reqwest::Url::parse(&format!(
@@ -374,7 +374,7 @@ impl Connection {
             let mode = Transport::MODES
                 .into_iter()
                 .find(|mode| modes.contains(mode))
-                .context("the voice server offers no encryption Yapfast knows")?;
+                .context("the voice server offers no encryption Discy knows")?;
             // Discord numbers the video SSRCs after the audio one.
             let stream = &ready["streams"][0];
             let video = stream["ssrc"]

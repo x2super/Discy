@@ -449,7 +449,7 @@ pub fn others(
     stop: Arc<AtomicBool>,
 ) -> Result<JoinHandle<()>> {
     if !devices() {
-        anyhow::bail!("Yapfast hears no other applications in tests");
+        anyhow::bail!("Discy hears no other applications in tests");
     }
     platform::others(skip, Box::new(heard), stop)
 }

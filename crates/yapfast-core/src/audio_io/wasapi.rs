@@ -137,7 +137,7 @@ pub fn full_speed(on: bool) {
         )
     };
     if let Err(error) = set {
-        tracing::debug!(%error, "Windows keeps its power throttling for Yapfast");
+        tracing::debug!(%error, "Windows keeps its power throttling for Discy");
     }
     // SAFETY: plain calls, each timeBeginPeriod balanced by a timeEndPeriod.
     unsafe {
@@ -663,7 +663,7 @@ mod others {
         );
         anyhow::ensure!(
             process != yapfast_process() && process != std::process::id(),
-            "Cannot share Yapfast's own audio"
+            "Cannot share Discy's own audio"
         );
         capture(Some(process), heard, stop)
     }

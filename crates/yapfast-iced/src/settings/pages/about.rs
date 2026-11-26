@@ -98,13 +98,18 @@ impl<'a> Page<'a> {
         parts.push(form::heading(theme, "LINKS"));
         let ink = crate::theme::rgb(theme.text);
         let link = |label, icon, page| -> Element<'a, Message> {
+            let icon = if icon == Icon::Logo {
+                self.cx.look.icons.own(icon, 18)
+            } else {
+                self.cx.look.icon(icon, 18, ink)
+            };
             action(
                 theme,
                 label,
                 Kind::Plain,
                 Some(account_message(AccountEvent::Open(page))),
             )
-            .icon(self.cx.look.icon(icon, 18, ink))
+            .icon(icon)
             .into()
         };
         parts.push(form::buttons([

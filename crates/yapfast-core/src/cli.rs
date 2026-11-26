@@ -36,7 +36,7 @@ pub fn audio_devices() -> Result<()> {
 pub async fn session(arguments: &[String]) -> Result<()> {
     let (command, arguments) = arguments
         .split_first()
-        .context("choose a session command; run yapfast --help")?;
+        .context("choose a session command; run discy --help")?;
     let mut options = BTreeMap::new();
     let mut flags = Vec::new();
     let mut arguments = arguments.iter();
@@ -58,7 +58,7 @@ pub async fn session(arguments: &[String]) -> Result<()> {
                     bail!("invalid or duplicate session option")
                 }
             }
-            _ => bail!("unknown session option; run yapfast --help"),
+            _ => bail!("unknown session option; run discy --help"),
         }
     }
     let root = match options.remove("--data-dir") {
@@ -72,7 +72,7 @@ pub async fn session(arguments: &[String]) -> Result<()> {
                 .context("sign-in needs --homeserver")?;
             let user = options.remove("--user").context("sign-in needs --user")?;
             if !options.is_empty() || flags != ["--password-stdin"] {
-                bail!("sign-in needs --password-stdin; run yapfast --help")
+                bail!("sign-in needs --password-stdin; run discy --help")
             }
             let password = read_secret()?;
             let session = Session::login(root, &homeserver, &user, &password).await?;
@@ -86,7 +86,7 @@ pub async fn session(arguments: &[String]) -> Result<()> {
                 vec![]
             };
             if !options.is_empty() || flags != expected {
-                bail!("invalid options for this session command; run yapfast --help")
+                bail!("invalid options for this session command; run discy --help")
             }
             let session = Session::restore(root).await?;
             match command.as_str() {
@@ -105,7 +105,7 @@ pub async fn session(arguments: &[String]) -> Result<()> {
                 }
             }
         }
-        _ => bail!("unknown session command; run yapfast --help"),
+        _ => bail!("unknown session command; run discy --help"),
     }
 }
 

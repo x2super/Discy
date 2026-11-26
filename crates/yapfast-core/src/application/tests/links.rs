@@ -68,42 +68,71 @@ fn invite_to(code: &str, guild: &str, channel: &str) -> chat::InvitePreview {
 
 #[test]
 #[cfg(feature = "discord")]
-fn join_a_server_shows_the_invite_and_joins_on_the_click() {
+fn join_a_server_joins_directly_and_handles_captcha() {
     let mut app = discord_server();
     app.dispatch(Action::OpenJoinServer);
+    let join = app.state.join.clone().unwrap();
+    assert_eq!(join.step, JoinStep::Choose);
+
+    app.dispatch(Action::SetJoinStep(JoinStep::Join));
+    assert_eq!(app.state.join.as_ref().unwrap().step, JoinStep::Join);
     assert!(
-        app.dispatch(Action::FindInvite("two words".into()))
+        app.dispatch(Action::JoinInvite("two words".into()))
             .is_empty()
     );
     assert!(app.state.join.as_ref().unwrap().error.is_some());
 
-    let effects = app.dispatch(Action::FindInvite(" https://discord.gg/abc ".into()));
+    let effects = app.dispatch(Action::JoinInvite(" https://discord.gg/abc ".into()));
     assert!(matches!(
         effects.as_slice(),
         [Effect::Backend(Command::Discord(DiscordCommand::ResolveInvite { code, typed: Some(typed) }))]
             if code == "abc" && typed == " https://discord.gg/abc "
     ));
     let join = app.state.join.clone().unwrap();
-    assert!(join.resolving && join.error.is_none());
+    assert!(join.resolving && join.auto_join && join.error.is_none());
     // An answer about another invite, typed before, changes nothing.
     app.apply(Event::InviteResolved {
         code: "old".into(),
         result: Ok(invite_to("old", "30", "31")),
     });
     assert!(app.state.join.as_ref().unwrap().preview.is_none());
-    app.apply(Event::InviteResolved {
+    // Resolving a new server's invite from the direct field joins in-app at once.
+    let effects = app.apply(Event::InviteResolved {
         code: "abc".into(),
         result: Ok(invite_to("abc", "20", "21")),
     });
-    let join = app.state.join.clone().unwrap();
-    assert!(!join.resolving && !join.member);
-    assert_eq!(join.preview.unwrap().name, "Builders");
-
-    let effects = app.dispatch(Action::JoinServer);
     assert!(matches!(
         effects.as_slice(),
-        [Effect::OpenPage(page)] if page == "https://discord.gg/abc"
+        [Effect::Backend(Command::Discord(DiscordCommand::JoinServer { preview, from_link: false }))]
+            if preview.code == "abc" && preview.server == "discord:20"
     ));
+    let join = app.state.join.clone().unwrap();
+    assert!(!join.resolving && join.joining && !join.member && !join.auto_join);
+    assert_eq!(join.preview.unwrap().name, "Builders");
+
+    // A captcha Discord asks for opens in the browser and can be reopened.
+    let effects = app.apply(Event::JoinCaptcha {
+        code: "abc".into(),
+        page: "https://captcha.example/join".into(),
+    });
+    assert!(matches!(
+        effects.as_slice(),
+        [Effect::OpenPage(page)] if page == "https://captcha.example/join"
+    ));
+    let effects = app.dispatch(Action::OpenJoinCaptcha);
+    assert!(matches!(
+        effects.as_slice(),
+        [Effect::OpenPage(page)] if page == "https://captcha.example/join"
+    ));
+
+    app.apply(Event::ServerJoined {
+        code: "abc".into(),
+        result: Ok(chat::JoinedServer {
+            server: "discord:20".into(),
+            room: "discord:20:21".into(),
+            form: false,
+        }),
+    });
     assert!(app.state.join.is_none());
 
     // Once Discord lists the server, the pending open takes effect.
@@ -127,7 +156,79 @@ fn join_a_server_shows_the_invite_and_joins_on_the_click() {
 
 #[test]
 #[cfg(feature = "discord")]
-fn an_invite_link_opens_the_server_or_the_dialog() {
+fn create_a_server_validates_handles_captcha_and_opens_when_listed() {
+    let mut app = discord_server();
+    app.dispatch(Action::OpenJoinServer);
+    app.dispatch(Action::SetJoinStep(JoinStep::Create));
+    assert_eq!(app.state.join.as_ref().unwrap().step, JoinStep::Create);
+
+    assert!(app.dispatch(Action::CreateServer("a".into())).is_empty());
+    assert!(app.state.join.as_ref().unwrap().error.is_some());
+
+    let effects = app.dispatch(Action::CreateServer("  Builders HQ  ".into()));
+    assert!(matches!(
+        effects.as_slice(),
+        [Effect::Backend(Command::Discord(DiscordCommand::CreateServer { name }))]
+            if name == "Builders HQ"
+    ));
+    assert!(app.state.join.as_ref().unwrap().creating);
+
+    let effects = app.apply(Event::CreateCaptcha {
+        page: "https://captcha.example/create".into(),
+    });
+    assert!(matches!(
+        effects.as_slice(),
+        [Effect::OpenPage(page)] if page == "https://captcha.example/create"
+    ));
+    let effects = app.dispatch(Action::OpenJoinCaptcha);
+    assert!(matches!(
+        effects.as_slice(),
+        [Effect::OpenPage(page)] if page == "https://captcha.example/create"
+    ));
+
+    app.apply(Event::ServerCreated {
+        result: Err("slow down".into()),
+    });
+    let join = app.state.join.as_ref().unwrap();
+    assert!(!join.creating && join.captcha.is_none());
+    assert_eq!(join.error.as_deref(), Some("slow down"));
+
+    app.dispatch(Action::CreateServer("Builders HQ".into()));
+    app.apply(Event::ServerCreated {
+        result: Ok("discord:55".into()),
+    });
+    assert!(app.state.join.is_none());
+
+    let mut snapshot = yapfast_discord::service::Snapshot::clone(app.discord.as_ref().unwrap());
+    let created = yapfast_discord::ready::server(&serde_json::json!({
+        "id": "55", "owner_id": "99",
+        "properties": {"name": "Builders HQ"},
+        "roles": [{"id": "55", "name": "@everyone", "position": 0,
+                   "permissions": yapfast_discord::ready::permission::VIEW_CHANNEL.to_string()}],
+        "channels": [{"id": "56", "type": 0, "name": "general", "position": 0}],
+    }))
+    .unwrap();
+    snapshot.servers.push(MarkedServer::from(created));
+    app.apply(discord_event(snapshot));
+    assert_eq!(
+        app.state.navigation,
+        Navigation::Server("discord:55".into())
+    );
+
+    // Preview mode cannot create servers on Discord.
+    app.state.preview = true;
+    app.dispatch(Action::OpenJoinServer);
+    app.dispatch(Action::SetJoinStep(JoinStep::Create));
+    assert!(app.dispatch(Action::CreateServer("Valid Name".into())).is_empty());
+    assert_eq!(
+        app.state.join.as_ref().unwrap().error.as_deref(),
+        Some("Creating a server requires a linked Discord account.")
+    );
+}
+
+#[test]
+#[cfg(feature = "discord")]
+fn an_invite_link_opens_the_server_or_joins_in_app() {
     let mut app = discord_server();
     // A link to a server she's in goes straight there.
     let effects = app.dispatch(Action::OpenInviteLink("in".into()));
@@ -144,16 +245,36 @@ fn an_invite_link_opens_the_server_or_the_dialog() {
     assert!(app.state.join.is_none());
     assert_eq!(app.state.selected.as_deref(), Some("discord:10:13"));
 
-    // One she isn't in shows it, and Join opens the browser to accept it.
+    // One she isn't in shows it, and JoinServer posts the invite in-app.
     app.dispatch(Action::OpenInviteLink("new".into()));
     app.apply(Event::InviteResolved {
         code: "new".into(),
         result: Ok(invite_to("new", "30", "31")),
     });
+    assert_eq!(app.state.join.as_ref().unwrap().step, JoinStep::Join);
     let effects = app.dispatch(Action::JoinServer);
     assert!(matches!(
         effects.as_slice(),
-        [Effect::OpenPage(page)] if page == "https://discord.gg/new"
+        [Effect::Backend(Command::Discord(DiscordCommand::JoinServer { preview, from_link: true }))]
+            if preview.code == "new"
+    ));
+    // A server requiring a verification form leaves a web-app link to finish.
+    app.apply(Event::ServerJoined {
+        code: "new".into(),
+        result: Ok(chat::JoinedServer {
+            server: "discord:30".into(),
+            room: "discord:30:31".into(),
+            form: true,
+        }),
+    });
+    assert_eq!(
+        app.state.join.as_ref().unwrap().form.as_deref(),
+        Some("https://discord.com/channels/30/31")
+    );
+    let effects = app.dispatch(Action::OpenJoinForm);
+    assert!(matches!(
+        effects.as_slice(),
+        [Effect::OpenPage(page)] if page == "https://discord.com/channels/30/31"
     ));
     assert!(app.state.join.is_none());
 }
@@ -163,13 +284,14 @@ fn an_invite_link_opens_the_server_or_the_dialog() {
 fn an_unknown_invite_says_so() {
     let mut app = discord_server();
     app.dispatch(Action::OpenJoinServer);
-    app.dispatch(Action::FindInvite("gone".into()));
+    app.dispatch(Action::SetJoinStep(JoinStep::Join));
+    app.dispatch(Action::JoinInvite("gone".into()));
     app.apply(Event::InviteResolved {
         code: "gone".into(),
         result: Err("This invite is invalid or has expired.".into()),
     });
     let join = app.state.join.clone().unwrap();
-    assert!(join.preview.is_none() && !join.resolving);
+    assert!(join.preview.is_none() && !join.resolving && !join.auto_join);
     assert_eq!(
         join.error.as_deref(),
         Some("This invite is invalid or has expired.")

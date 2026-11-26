@@ -18,15 +18,15 @@ use yapfast_core::{
 
 use crate::layout::Layout;
 
-pub const USAGE: &str = "usage: yapfast theme check <folder> [--marketplace]
-       yapfast theme install <folder> [--data-dir <folder>]
-       yapfast theme new <name> [--light] [--from <theme>] [--author <name>] [--id <id>] [--dir <folder>] [--data-dir <folder>]
-       yapfast theme export <custom theme> <folder> [--author <name>] [--data-dir <folder>]";
-const CHECK_USAGE: &str = "usage: yapfast theme check <folder> [--marketplace]";
-const INSTALL_USAGE: &str = "usage: yapfast theme install <folder> [--data-dir <folder>]";
-const NEW_USAGE: &str = "usage: yapfast theme new <name> [--light] [--from <theme>] [--author <name>] [--id <id>] [--dir <folder>] [--data-dir <folder>]";
+pub const USAGE: &str = "usage: discy theme check <folder> [--marketplace]
+       discy theme install <folder> [--data-dir <folder>]
+       discy theme new <name> [--light] [--from <theme>] [--author <name>] [--id <id>] [--dir <folder>] [--data-dir <folder>]
+       discy theme export <custom theme> <folder> [--author <name>] [--data-dir <folder>]";
+const CHECK_USAGE: &str = "usage: discy theme check <folder> [--marketplace]";
+const INSTALL_USAGE: &str = "usage: discy theme install <folder> [--data-dir <folder>]";
+const NEW_USAGE: &str = "usage: discy theme new <name> [--light] [--from <theme>] [--author <name>] [--id <id>] [--dir <folder>] [--data-dir <folder>]";
 const EXPORT_USAGE: &str =
-    "usage: yapfast theme export <custom theme> <folder> [--author <name>] [--data-dir <folder>]";
+    "usage: discy theme export <custom theme> <folder> [--author <name>] [--data-dir <folder>]";
 
 /// Runs `yapfast theme …` (`arguments` after `theme`), printing what it did,
 /// and returns the exit status: 0 done, 1 failed, 2 not understood.

@@ -662,7 +662,7 @@ pub(super) fn side_list<'a>(
             }
             for (audio, title) in &share.audio_options {
                 let subtitle =
-                    (*audio == StreamAudio::All).then_some("Excludes Yapfast's own audio".into());
+                    (*audio == StreamAudio::All).then_some("Excludes Discy's own audio".into());
                 rows = rows.push(choice(
                     title.as_str().into(),
                     subtitle,

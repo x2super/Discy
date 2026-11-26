@@ -393,7 +393,7 @@ pub(super) fn read_sounds(
         let at = format!("{place}.{name}");
         let Some(slot) = SoundSlot::named(name) else {
             notes.push(format!(
-                "\"{at}\" isn't a sound or an event Yapfast plays; ignored"
+                "\"{at}\" isn't a sound or an event Discy plays; ignored"
             ));
             continue;
         };
@@ -469,7 +469,7 @@ pub(super) fn read_icons(
     for (name, written) in entries {
         let at = format!("{place}.{name}");
         let Some(icon) = icon_named(name) else {
-            notes.push(format!("\"{at}\" isn't one of Yapfast's icons; ignored"));
+            notes.push(format!("\"{at}\" isn't one of Discy's icons; ignored"));
             continue;
         };
         let file = |value: &Value, here: &str| -> Result<PathBuf, Error> {
@@ -564,14 +564,14 @@ pub fn decode_sound(path: &Path, bytes: &[u8]) -> Result<Vec<i16>, String> {
         "wav" => wav(bytes),
         #[cfg(feature = "discord")]
         "ogg" | "opus" | "mp3" => crate::soundboard::decode(bytes)
-            .map_err(|_| "isn't a sound Yapfast can play".to_owned()),
+            .map_err(|_| "isn't a sound Discy can play".to_owned()),
         #[cfg(not(feature = "discord"))]
-        "ogg" | "opus" | "mp3" => Err("this Yapfast plays only .wav sounds".to_owned()),
+        "ogg" | "opus" | "mp3" => Err("this Discy plays only .wav sounds".to_owned()),
         _ => Err("isn't a sound: use .wav, .ogg, .opus or .mp3".to_owned()),
     });
     let mut samples = match decoded {
         Ok(result) => result?,
-        Err(_) => return Err("isn't a sound Yapfast can play".into()),
+        Err(_) => return Err("isn't a sound Discy can play".into()),
     };
     if samples.len() > (LONGEST * RATE as f32) as usize * 2 {
         return Err(format!("lasts longer than {LONGEST} seconds"));
@@ -609,7 +609,7 @@ const LONGEST: f32 = 6.0;
 /// mono or stereo, at 8 to 96 kHz, as 48 kHz stereo. Read by hand, bounded
 /// by the file's own length: no chunk is trusted past the bytes there are.
 fn wav(bytes: &[u8]) -> Result<Vec<i16>, String> {
-    let refused = || "isn't a WAV file Yapfast reads".to_owned();
+    let refused = || "isn't a WAV file Discy reads".to_owned();
     if bytes.len() < 12 || &bytes[0..4] != b"RIFF" || &bytes[8..12] != b"WAVE" {
         return Err(refused());
     }

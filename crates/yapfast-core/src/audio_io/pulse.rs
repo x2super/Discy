@@ -152,7 +152,7 @@ fn open(
         rate: format.rate,
     };
     Simple::new(
-        None, "Yapfast", direction, device, name, &spec, None, attributes,
+        None, "Discy", direction, device, name, &spec, None, attributes,
     )
     .map_err(|error| anyhow!("{error}"))
 }
@@ -221,7 +221,7 @@ struct Listed {
 /// Every sink, or every source that is not a monitor.
 fn list(sinks: bool) -> Result<Vec<Listed>> {
     let mut mainloop = Mainloop::new().context("no PulseAudio main loop")?;
-    let mut context = Context::new(&mainloop, "Yapfast").context("no PulseAudio context")?;
+    let mut context = Context::new(&mainloop, "Discy").context("no PulseAudio context")?;
     context
         .connect(None, ContextFlags::NOFLAGS, None)
         .map_err(|error| anyhow!("{error}"))
@@ -231,7 +231,7 @@ fn list(sinks: bool) -> Result<Vec<Listed>> {
         match context.get_state() {
             context::State::Ready => break,
             context::State::Failed | context::State::Terminated => {
-                bail!("the sound server refused Yapfast")
+                bail!("the sound server refused Discy")
             }
             _ => {}
         }
@@ -383,7 +383,7 @@ mod others {
         let heard: Shared = Rc::new(RefCell::new(heard));
         let mut mainloop = Mainloop::new().context("no PulseAudio main loop")?;
         let context = Rc::new(RefCell::new(
-            Context::new(&mainloop, "Yapfast").context("no PulseAudio context")?,
+            Context::new(&mainloop, "Discy").context("no PulseAudio context")?,
         ));
         context
             .borrow_mut()
@@ -542,7 +542,7 @@ mod others {
             rate: RATE,
             channels: 2,
         };
-        let stream = Stream::new(context, "Yapfast stream sound", &spec, None)
+        let stream = Stream::new(context, "Discy stream sound", &spec, None)
             .context("PulseAudio refused a capture stream")?;
         let stream = Rc::new(RefCell::new(stream));
         stream

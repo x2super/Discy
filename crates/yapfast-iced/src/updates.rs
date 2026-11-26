@@ -101,7 +101,7 @@ fn announce_update(app: &mut App, offered: Option<desktop::Offered>) {
         notifier.show(
             yapfast_core::chat::Alert {
                 room: ABOUT.into(),
-                title: format!("Yapfast {} is available", offered.tag),
+                title: format!("Discy {} is available", offered.tag),
                 body: "Click to see what's new.".into(),
                 picture: None,
                 call: false,

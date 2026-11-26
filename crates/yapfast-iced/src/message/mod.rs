@@ -1623,7 +1623,7 @@ fn delivery_line<'a>(
         chat::Delivery::Sending if message.attachments.is_empty() => return None,
         chat::Delivery::Sending => ("Sending...", false, true),
         chat::Delivery::Waiting => (
-            "Not sent yet. Yapfast sends it when the connection returns.",
+            "Not sent yet. Discy sends it when the connection returns.",
             false,
             true,
         ),

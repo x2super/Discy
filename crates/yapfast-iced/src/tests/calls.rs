@@ -443,7 +443,7 @@ fn the_share_menus_settings_are_rows_that_open_their_choices_beside_them() {
     // The audio's choices: here, without an application's.
     point_at(&mut app, "Audio");
     assert_eq!(side(&app), Some(Setting::Audio));
-    assert!(shows(&app, "No audio") && shows(&app, "Excludes Yapfast's own audio"));
+    assert!(shows(&app, "No audio") && shows(&app, "Excludes Discy's own audio"));
     assert!(!super::present(&app, "Changes apply immediately"));
     // The pointer on a row without choices closes them, as picking what
     // to share does.

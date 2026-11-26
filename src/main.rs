@@ -31,7 +31,7 @@ mod protocol;
 /// The window's app ID on Linux, and the name of its desktop entry and
 /// icon; keybinds' portal session goes by it too.
 #[cfg(feature = "desktop")]
-pub const APP_ID: &str = "io.github.yapfast.Yapfast";
+pub const APP_ID: &str = "io.github.discy.Discy";
 #[cfg(feature = "desktop")]
 mod tray;
 #[cfg(feature = "desktop")]
@@ -108,7 +108,7 @@ fn main() -> Result<()> {
 
     #[cfg(all(windows, feature = "desktop"))]
     match data_directory(&arguments) {
-        Some(directory) if !has_console() => logging::init_to_file(&directory.join("yapfast.log")),
+        Some(directory) if !has_console() => logging::init_to_file(&directory.join("discy.log")),
         _ => logging::init(),
     }
     #[cfg(not(all(windows, feature = "desktop")))]
@@ -122,7 +122,7 @@ fn main() -> Result<()> {
     let open_link = links.pop().and_then(|link| {
         let written = written_link(&link);
         if written.is_none() {
-            tracing::info!("Yapfast has no place for the link it was handed; starting without it");
+            tracing::info!("Discy has no place for the link it was handed; starting without it");
         }
         written
     });
@@ -161,7 +161,7 @@ fn main() -> Result<()> {
         [argument] if argument == "--smoke-test" => {
             runtime.block_on(runtime.spawn(yapfast_core::check_build()))?;
             println!(
-                "Yapfast {}: Tokio, LiveKit{}{} build check passed.",
+                "Discy {}: Tokio, LiveKit{}{} build check passed.",
                 env!("CARGO_PKG_VERSION"),
                 if cfg!(feature = "matrix") {
                     ", Matrix SDK, MatrixRTC"
@@ -195,11 +195,11 @@ fn main() -> Result<()> {
             println!("{}", help());
             Ok(())
         }
-        _ => bail!("unknown argument; run yapfast --help"),
+        _ => bail!("unknown argument; run discy --help"),
     }
 }
 
-/// Whether Yapfast's output reaches someone: a file or pipe it was given, or
+/// Whether Discy's output reaches someone: a file or pipe it was given, or
 /// the console it was started from, which it joins. A Windows program
 /// without a console of its own gets neither when opened from Explorer.
 #[cfg(all(windows, feature = "desktop"))]
@@ -208,7 +208,7 @@ fn has_console() -> bool {
         Foundation::INVALID_HANDLE_VALUE,
         System::Console::{ATTACH_PARENT_PROCESS, AttachConsole, GetStdHandle, STD_OUTPUT_HANDLE},
     };
-    // SAFETY: neither call takes a pointer; Yapfast's other threads haven't started.
+    // SAFETY: neither call takes a pointer; Discy's other threads haven't started.
     unsafe {
         let output = GetStdHandle(STD_OUTPUT_HANDLE);
         (!output.is_null() && output != INVALID_HANDLE_VALUE)
@@ -216,7 +216,7 @@ fn has_console() -> bool {
     }
 }
 
-/// The folder Yapfast keeps its files in, which holds the log without a console.
+/// The folder Discy keeps its files in, which holds the log without a console.
 #[cfg(all(windows, feature = "desktop"))]
 fn data_directory(arguments: &[String]) -> Option<std::path::PathBuf> {
     match arguments
@@ -232,11 +232,11 @@ fn data_directory(arguments: &[String]) -> Option<std::path::PathBuf> {
 /// in this build's window.
 fn help() -> String {
     let window = if cfg!(feature = "desktop") {
-        "Without arguments, opens Yapfast's window and restores a saved session.\n\
+        "Without arguments, opens Discy's window and restores a saved session.\n\
          --renderer selects tiny-skia (software) or wgpu (gpu) for this start, over the setting.\n\
-         If wgpu fails to start, Yapfast restarts with tiny-skia.\n\
+         If wgpu fails to start, Discy restarts with tiny-skia.\n\
          --background starts in the system tray with a saved session, as starting at sign-in does.\n\
-         LINK opens a Discord server, channel, message, profile or invite link in Yapfast.\n\
+         LINK opens a Discord server, channel, message, profile or invite link in Discy.\n\
          --release-discord-links gives discord:// links back to the app that had them, as uninstalling does.\n"
     } else {
         "This build has no window; only the commands below that need none run.\n"
@@ -247,22 +247,22 @@ fn help() -> String {
         ""
     };
     format!(
-        "Usage: yapfast [--preview] [--data-dir PATH] [--renderer gpu|software] [--background] [--default-theme] [--theme-dev FOLDER] [LINK]\n\
-         \x20      yapfast [--smoke-test | --version | --help{links}]\n\
-         \x20      yapfast --call-experiment [--resume PATH]\n\
-         \x20      yapfast [--voice-demo | --audio-devices]\n\
-         \x20      yapfast theme check FOLDER [--marketplace]\n\
-         \x20      yapfast theme install FOLDER [--data-dir PATH]\n\
-         \x20      yapfast theme new NAME [--light] [--from THEME] [--author NAME]\n\
-         \x20      yapfast theme export CUSTOM-THEME FOLDER\n\
-         \x20      yapfast session login --homeserver URL --user USER --password-stdin [--data-dir PATH]\n\
-         \x20      yapfast session status [--data-dir PATH]\n\
-         \x20      yapfast session recover --key-stdin [--data-dir PATH]\n\
-         \x20      yapfast session logout [--data-dir PATH]\n\
+        "Usage: discy [--preview] [--data-dir PATH] [--renderer gpu|software] [--background] [--default-theme] [--theme-dev FOLDER] [LINK]\n\
+         \x20      discy [--smoke-test | --version | --help{links}]\n\
+         \x20      discy --call-experiment [--resume PATH]\n\
+         \x20      discy [--voice-demo | --audio-devices]\n\
+         \x20      discy theme check FOLDER [--marketplace]\n\
+         \x20      discy theme install FOLDER [--data-dir PATH]\n\
+         \x20      discy theme new NAME [--light] [--from THEME] [--author NAME]\n\
+         \x20      discy theme export CUSTOM-THEME FOLDER\n\
+         \x20      discy session login --homeserver URL --user USER --password-stdin [--data-dir PATH]\n\
+         \x20      discy session status [--data-dir PATH]\n\
+         \x20      discy session recover --key-stdin [--data-dir PATH]\n\
+         \x20      discy session logout [--data-dir PATH]\n\
          \n\
          {window}\
          --theme-dev FOLDER shows the theme in FOLDER and shows it again each time a file in it is saved.\n\
-         --default-theme starts in the default look, keeping the theme chosen; Ctrl+Shift+T turns a theme off while Yapfast runs.\n\
+         --default-theme starts in the default look, keeping the theme chosen; Ctrl+Shift+T turns a theme off while Discy runs.\n\
          --preview opens local sample conversations without connecting to Matrix.\n\
          --smoke-test checks the linked stack without signing in or opening audio devices.\n\
          --version prints which build this is: its version, whether it is a stable release, a nightly or a development build, and its commit.\n\
@@ -354,7 +354,7 @@ fn finish_update(prepared: update::install::Prepared, arguments: &[String]) -> R
 /// [`Start::restart_arguments`].
 #[cfg(feature = "desktop")]
 fn relaunch(arguments: &[String], gpu_failure: Option<&str>, link: Option<&str>) -> Result<()> {
-    let program = std::env::current_exe().context("could not find Yapfast to restart it")?;
+    let program = std::env::current_exe().context("could not find Discy to restart it")?;
     relaunch_program(&program, arguments, gpu_failure, link)
 }
 
@@ -382,13 +382,13 @@ fn relaunch_program(
     #[cfg(unix)]
     {
         use std::os::unix::process::CommandExt;
-        Err(command.exec()).context("could not restart Yapfast")
+        Err(command.exec()).context("could not restart Discy")
     }
     #[cfg(not(unix))]
     {
         // Waiting for the replacement would keep this process and its stopped
         // window alive until the new client closes.
-        command.spawn().context("could not restart Yapfast")?;
+        command.spawn().context("could not restart Discy")?;
         std::process::exit(0);
     }
 }
@@ -529,7 +529,9 @@ fn link_arguments(arguments: &mut Vec<String>) -> Vec<String> {
     arguments
         .extract_if(.., |argument| {
             argument.split_once(':').is_some_and(|(scheme, _)| {
-                scheme.eq_ignore_ascii_case("discord") || scheme.eq_ignore_ascii_case("yapfast")
+                scheme.eq_ignore_ascii_case("discord")
+                    || scheme.eq_ignore_ascii_case("discy")
+                    || scheme.eq_ignore_ascii_case("yapfast")
             }) || written_link(argument).is_some()
         })
         .collect()

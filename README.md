@@ -1,23 +1,22 @@
 <p align="center">
-  <img src="packaging/icon.svg" width="96" height="96" alt="">
+  <img src="packaging/icon.svg" width="96" height="96" alt="Discy logo">
 </p>
 
-<h1 align="center">Yapfast</h1>
+<h1 align="center">Discy</h1>
 
 <p align="center">
-  <a href="https://github.com/yapfast/yapfast/releases/latest"><img src="https://img.shields.io/github/v/release/yapfast/yapfast?label=beta&color=f0b232" alt="The latest release, a beta"></a>
+  <a href="https://github.com/x2super/Discy/releases/latest"><img src="https://img.shields.io/github/v/release/x2super/Discy?label=release&color=5865F2" alt="Latest release"></a>
   <a href="#get-started"><img src="https://img.shields.io/badge/Windows%20%7C%20Linux-0078D4" alt="Windows and Linux"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/yapfast/yapfast?color=blue" alt="License: GPL 3.0"></a>
-  <a href="https://yapfast.com/discord-invite"><img src="https://img.shields.io/badge/Discord-join-5865F2?logo=discord&logoColor=white" alt="Join the Yapfast Discord server"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/x2super/Discy?color=blue" alt="License: GPL 3.0"></a>
 </p>
 
 <p align="center">
-  <b>A Discord client without the web browser.</b><br>
-  About 30 MB of RAM idle, where Discord's app takes 720 MB (<a href="#measured-against-discord">measured as Vesktop</a>).
+  <b>A fast, lightweight native Discord client without the web browser.</b><br>
+  About 30 MB of RAM idle, where Discord's Electron app takes ~720 MB (<a href="#measured-against-discord">measured as Vesktop</a>).
 </p>
 
 <p align="center">
-  Native app written in Rust · Voice, video and screen sharing
+  Native app written in Rust · Voice, video and screen sharing · Create &amp; join servers in-app
 </p>
 
 <p align="center">
@@ -25,39 +24,39 @@
   &nbsp;·&nbsp;
   <a href="#linux"><b>Download for Linux</b></a>
   &nbsp;·&nbsp;
-  <a href="https://yapfast.com">yapfast.com</a>
+  <a href="https://github.com/x2super/Discy/releases"><b>Releases</b></a>
 </p>
 
 <p align="center">
-  <img src="docs/images/yapfast.png" alt="Yapfast showing a group DM, with the server list on the left, the conversation in the middle and its members on the right"><br>
-  <sub>A test account on a fake Discord server. Nobody in there said any of this, or endorses Yapfast (sadly).</sub>
+  <img src="docs/images/yapfast.png" alt="Discy showing a group DM, with the server list on the left, the conversation in the middle and its members on the right"><br>
+  <sub>A test account on a fake Discord server.</sub>
 </p>
 
-## Why?
+## Why Discy?
 
-Discord's desktop app is a whole ass Chromium running Discord's website, and it
-sits at about 720 MB of RAM doing nothing (insane, I know right?!?). That
-annoyed me enough to write my own in Rust.
+Discord's desktop app runs a full Chromium browser to display Discord's website,
+consuming around 720 MB of RAM while idle.
 
-Yapfast does the same job (doing nothing) in about 30 MB. There's no browser
-engine anywhere in it or near it: it talks to Discord's API itself and draws its
-own window with [iced](https://iced.rs), like a game would. Your
-servers, DMs, friends, voice and GIFs are all there, and if you know Discord,
-you already know where everything is.
+**Discy** is a native Rust desktop client (forked from [Yapfast](https://github.com/yapfast/yapfast))
+that talks directly to Discord's API and draws its own interface with
+[iced](https://iced.rs) — no browser engine anywhere. Your servers, DMs,
+friends, voice channels, screen sharing, and GIFs are all there, starting in
+a fraction of a second and using ~30 MB of RAM idle.
 
-It opens fast af, too. I timed both, from clicking the icon to reading my
-messages: Discord took 8 seconds on my Windows PC, Yapfast took 0.22 seconds,
-because it shows the messages it saved last time and catches up while you read.
+### What's customized in Discy
+
+- **Discy branding & icon**: Native `discy.exe` executable, Windows Setup Installer (`Discy-…-windows-x64-setup.exe`), system tray, and notifications.
+- **Create & Join Server flow**: Clicking the `+` button in the server rail opens an **Add a Server** dialog letting you choose between **Create a Server** (`POST /guilds` in-app) and **Join a Server** (direct in-app `POST /invites/{code}` with no separate "Find Invite" step).
 
 ## Measured against Discord
 
 <table>
-  <tr><th></th><th>Vesktop memory</th><th>Yapfast memory</th><th>Vesktop CPU</th><th>Yapfast CPU</th></tr>
+  <tr><th></th><th>Vesktop memory</th><th>Discy memory</th><th>Vesktop CPU</th><th>Discy CPU</th></tr>
   <tr><td>Idle</td><td>724 MB</td><td>30 MB (−96%)</td><td>0.11%</td><td>0.015% (−86%)</td></tr>
   <tr><td>Image-heavy channel</td><td>706 MB</td><td>41 MB (−94%)</td><td>0.17%</td><td>0.008% (−95%)</td></tr>
   <tr><td>In a call</td><td>888 MB</td><td>44 MB (−95%)</td><td>0.46%</td><td>0.33% (−28%)</td></tr>
   <tr><td>Sharing your screen¹</td><td>1,013 MB</td><td>113 MB (−89%)</td><td>2.15%</td><td>1.1% (−48%)</td></tr>
-  <tr><th></th><th colspan="2">Discord</th><th colspan="2">Yapfast</th></tr>
+  <tr><th></th><th colspan="2">Discord</th><th colspan="2">Discy</th></tr>
   <tr><td>Opening the app²</td><td colspan="2" align="center">8 s</td><td colspan="2" align="center">0.22 s (36× faster)</td></tr>
 </table>
 
@@ -66,23 +65,17 @@ because it shows the messages it saved last time and catches up while you read.
 
 <br>
 
-Vesktop is basically Discord's own app: the same Discord web app, in the same
-Electron, with Vencord on top. So its numbers stand in for Discord's. CPU counts
-the whole processor as 100%.
+Measurements are from upstream Yapfast against Vesktop (Electron + Vencord) and
+Discord's desktop client. CPU counts the whole processor as 100%.
 
-¹ Sharing a 1920×1080 monitor at 30 frames a second, while in the call.
-Yapfast encodes on the graphics card when it has an encoder, here an NVIDIA
-RTX 3090 sending H264. Encoding on the processor with x264 instead, it takes
-2.5%, a little more than Vesktop.
+¹ Sharing a 1920×1080 monitor at 30 FPS while in a call, using hardware H.264
+encoding on an NVIDIA RTX 3090 (software x264 uses ~2.5%).
 
-² From clicking the icon to reading your messages, against Discord's own app
-rather than Vesktop, timed on my Windows PC. Yapfast shows the messages it saved
-last time and catches up while you read.
+² Cold launch from clicking the icon to reading messages, showing cached
+history while catching up live.
 
-Memory and CPU measured on 25 October 2026, and screen sharing on 27 October,
-all on the same PC. The machine, what "memory" counts and how each scenario ran
-are in [the measurements](docs/measurements/README.md). Your numbers will depend
-on how many servers and DMs you have.
+Methodology and hardware details are documented in
+[docs/measurements/README.md](docs/measurements/README.md).
 
 </details>
 
@@ -92,37 +85,27 @@ on how many servers and DMs you have.
 
 Discord's saved Favorites appear behind the star in the server rail, with their
 categories and order. Right-click a channel, DM or group DM to add or remove it;
-the change syncs to the same Discord account list. See [Favorites](docs/discord/favorites.md).
+changes sync with your Discord account. See [Favorites](docs/discord/favorites.md).
 
 ### The GIF picker
 
-My favorite part :p Your favorites live on disk as 40 KB clips, so they're
-there the moment it opens, and you're done sitting there cringing while the
-GOATed GIF loads.
+Your favorite GIFs live on disk as compact clips so the picker opens instantly.
 
 <img src="docs/images/features/gif-picker.webp" alt="The GIF picker opening on its favorites over #general, and one of them sent to the channel.">
 
 ### Voice, cameras and Go Live
 
-Voice channels and DM calls, with mute, deafen, a volume for each person,
-noise suppression, echo removal, and a voice gate you can tune, or
-push-to-talk on any key or combination, held in any app. Keybinds mute,
-deafen or push to mute from any app too ([keybinds](docs/keybinds.md)). Go
-Live, watch other people's streams, turn on your camera and play the
-soundboard. The call stays up while you read other channels, busy voice
-channels say how long their call has gone on, and pointing at a Discord
-voice channel shows who is in it, who is live and whose camera is on.
-
-The noise suppression could be better, though. Know an open source one that
-does a better job? PLEASE tell me.
+Voice channels and DM calls, with mute, deafen, per-user volume, noise
+suppression (RNNoise & DeepFilterNet), echo removal, tunable voice gate, and
+global push-to-talk / mute / deafen keybinds ([keybinds](docs/keybinds.md)).
+Supports Go Live screen sharing, watching streams, cameras, and soundboards.
 
 <img src="docs/images/features/voice.webp" alt="A voice channel of seven people, two with their cameras on. One person's stream opens large, then the grid comes back.">
 
 ### Forums and polls
 
-Browse a forum's posts as cards, with their tags, first message, top reaction
-and thumbnail, search them, post in them, and read one beside the forum. Vote
-in polls, watch the votes come in, make your own and end them early.
+Browse forum posts as cards with tags, top reactions and thumbnails, post and
+reply beside the forum, and create or vote in polls.
 
 <img src="docs/images/features/forum.webp" alt="A help forum's posts as cards; one opens beside the list with its replies, then closes.">
 
@@ -132,27 +115,19 @@ in polls, watch the votes come in, make your own and end them early.
 
 ### Themes
 
-Ten of them, Catppuccin and Tokyo Night among them, and Bonfire, which is
-Discord's own colors. Or make your own in the editor, and watch the window
-change as you type each color.
+Ten built-in themes (including Discy, Bonfire, Catppuccin, and Tokyo Night)
+plus a live theme creator and package support.
 
 <img src="docs/images/features/themes.webp" alt="The same channel in each of the ten built-in themes, one after another.">
 
 ### Games on your profile
 
-The game you play, found among your running programs on Linux, Windows and
-macOS, Steam's and Wine's included, and on Linux and Windows the Rich Presence
-games send, with details, elapsed time, images and buttons.
-
-**Settings → Game activity** turns sharing on and off as Discord's own setting
-does, names games Yapfast doesn't know, and lists programs it never shows as a
-game. See
-[game detection](docs/discord/people.md#game-detection) and
-[Rich Presence](docs/discord/people.md#rich-presence).
-
-What your linked Spotify account plays shows as "Listening to Spotify" with only
-Yapfast open, from any player, as Discord's own "Display Spotify as your status"
-setting says. See [Spotify](docs/discord/people.md#listening-to-spotify).
+Automatic game detection on Linux, Windows and macOS (including Steam and Wine),
+Rich Presence with details, timestamps, images and buttons, plus "Listening to
+Spotify" integration. Configure in **Settings → Game activity**. See
+[game detection](docs/discord/people.md#game-detection),
+[Rich Presence](docs/discord/people.md#rich-presence), and
+[Spotify](docs/discord/people.md#listening-to-spotify).
 
 <p align="center">
   <img src="docs/images/features/playing.webp" width="260" alt="A profile card saying Playing Deadlock, with the game's icon.">
@@ -160,14 +135,12 @@ setting says. See [Spotify](docs/discord/people.md#listening-to-spotify).
 
 ### Running a server
 
-Server Settings with roles, emoji, stickers, bans, the audit log and the rest of
-the pages your roles let you use, and channel settings with their permissions.
-Make and edit channels and categories, invite people, hand out roles, change
-nicknames, time out, kick and ban. In voice, server mute, deafen and move people
-to another channel, from their menu or by dragging them there. Edit your server
-profile, and leave. Join a server by invite, from the + under your servers or a
-link in chat, and open a scheduled event from its link to mark yourself
-interested. Folders show up as they do in Discord.
+Full Server Settings (roles, emoji, stickers, bans, audit log, moderation) and
+channel permissions. Create and edit channels and categories, invite people,
+assign roles, change nicknames, time out, kick and ban, and manage members in
+voice. Click `+` at the bottom of the server rail to **Create a Server** or
+**Join a Server** directly in-app by invite link or code, or open clicked
+invite and scheduled event links in-app.
 
 <p align="center">
   <img src="docs/images/features/server-settings.webp" width="640" alt="Server Settings on a role's Display page: its name, a gold color picked, and its icon.">
@@ -175,331 +148,128 @@ interested. Folders show up as they do in Discord.
 
 ### Everything else
 
-- **Servers, channels, DMs and group DMs**, all live, with member lists. Pin,
-  mute or close a DM from its menu, leave a group DM, and accept or ignore
-  message requests.
-- **Messages** you can send, reply to, edit, react to, pin, forward, mark
-  unread, copy a link to and attach files to, with Markdown, embeds, custom
-  emoji, stickers and spoilers. Voice messages play, with their speed and
-  volume. Bots' buttons, dropdown menus and forms work too, radio buttons,
-  checkboxes and file uploads included, and so do apps' slash commands: type
-  `/`, pick one and fill in its options, files and autocomplete included; an
-  app's answer says who used which command. Apps' message and user commands
-  are under Apps in a message's or a person's menu. Discord's own links to servers, channels, messages and profiles open in
-  Yapfast, including one handed to it by the desktop.
-- **Threads**: start one from a message, browse a channel's threads, join or
-  leave one, and read it beside its channel.
-- **Search** a whole server with Discord's filters, and browse a channel's pins.
-- **Profiles** as Discord draws them: badges, server tags, avatar decorations,
-  nameplates, name styles, profile effects and frames, what others are doing
-  with their Rich Presence buttons, and the full profile's Board, Wishlist and
-  recent activity. Edit Profile changes your own theme, name style and server
-  tag.
-- **Friends**: requests, adding by username, nicknames, notes, profile cards,
-  your status and custom status (custom emoji included). Block and ignore
-  people from their menu, block and unblock them from their profile, hide what
-  blocked people write, and unblock them from a list in Settings. Active Now
-  sits beside the friends list.
-- **Several accounts**: link as many as you like, and switch between them from your
-  account card or manage them in a dialog, as Discord's own apps do.
-- **Notifications** that follow your Discord settings, muting for channels,
-  categories and servers, and unread markers. The inbox lists unread channels
-  and your recent mentions, filtered by ping, jumping to their messages.
-- **Soft sounds** for joining, leaving, muting and messages, in six sets.
+- **Servers, channels, DMs and group DMs**, all live, with member lists,
+  message requests, and server folders.
+- **Messages** with Markdown, embeds, custom emoji, stickers, spoilers,
+  replies, edits, reactions, pins, forwarding, attachments, voice messages,
+  bot components/modals, and slash/context commands.
+- **Threads**, **full server search**, **rich user profiles**, **friends**,
+  **multi-account switching**, **desktop notifications & inbox**, and **UI sound packs**.
 
-### Not there yet
+### Limitations
 
-- Activities.
-- Making and changing server folders.
-- A server's form for new members, such as its rules, when you join. Yapfast
-  sends you to Discord in your browser to fill it in.
-- Captchas, sort of. If Discord asks for one while you link or join a server,
-  Yapfast opens it in your browser, but I haven't hit one against real
-  Discord yet, so who knows..
+- Activities are not supported yet.
+- Creating and editing server folders is not supported yet.
+- New-member verification forms (`show_verification_form`) open in Discord's
+  web app to finish.
+- If Discord requests a captcha while signing in, creating, or joining a
+  server, Discy opens the solver page in your browser and continues once solved.
 
-Use Discord in a browser for these until then; it has all of it, and you have a
-browser open anyway. [The Discord plan](docs/discord/README.md) has the rest, in the
-order I'm working on it.
-
-It's a beta, and it's what I use for Discord every day, so it had better
-be usable. Still, there are rough edges; when you hit one,
-[open an issue](https://github.com/yapfast/yapfast/issues) and I'll fix it, or
-come hang out on the [Yapfast Discord server](https://yapfast.com/discord-invite)
-and tell me there.
-
-### Not for you?
-
-- [Vesktop](https://vesktop.dev) if you want plugins. Yapfast has none yet
-  (they're coming, dw), and Vesktop ships with Vencord's.
-- [Ripcord](https://cancel.fm/ripcord/) if you want something even plainer.
-  It's native too, but closed source, and it does Slack on the side.
-
-## Will Discord ban me?
+## Account Safety Notice
 
 > [!WARNING]
-> Probably not, but I can't promise it. Third-party clients, Yapfast included,
-> are against Discord's Terms of Service. In practice Discord rarely bans anyone
-> for using one; the accounts that get banned are almost always spamming or
-> running automation. Yapfast only does what you click, and keeps to the same
-> limits Discord's own app does.
->
-> If losing your account would be a disaster, don't use any third-party client,
-> this one or another. And don't post screenshots of it in a server whose
-> moderators might ban you for it. Yapfast tells you all this again before it
-> shows the sign-in code.
+> Third-party clients, Discy included, are against Discord's Terms of Service.
+> Discy only performs actions you explicitly click and does not run automation
+> or spam, but using any third-party client carries some risk to your account.
+> Use at your own discretion.
 
-## Where your messages go
+## Privacy
 
-Straight from your PC to Discord, or to your Matrix server. I don't run a
-Yapfast server, so nothing in between could keep a copy (I'd have to pay for
-servers just to snoop on your DMs, and no thanks :D).
-
-- You link your account by scanning a QR code with Discord's phone app, so
-  Yapfast never sees your password.
-- The login token stays in your system's credential store, and only ever goes
-  to Discord. Unlinking deletes it, and signs out the session the QR code
-  made. A pasted token's session stays, as it's the app you copied it from.
-- It sends no analytics or crash reports. It looks for updates only if you
-  turn on **Check for updates** in **Settings → About**, with one request to
-  GitHub that says nothing about you.
-- Pictures and GIFs load from wherever they're hosted, such as Discord or
-  Tenor.
-
-Don't want to take my word for it? Fair, the code's all right here.
+- Connects directly from your computer to Discord (or your Matrix homeserver
+  when built with `--features matrix`) with no intermediary server.
+- Supports QR code login so Discy never sees your password; tokens are stored
+  in your OS credential store.
+- No analytics or telemetry.
 
 ## Get started
 
 ### Windows 10 and 11
 
-1. Download `Yapfast-…-windows-x64-setup.exe` from the
-   [latest release](https://github.com/yapfast/yapfast/releases/latest).
-2. Run it. It installs just for you, with no administrator prompt. The
-   installer isn't signed yet, so SmartScreen may get nervous: choose **More
-   info**, then **Run anyway**.
-3. Yapfast shows a QR code. On your phone, open Discord, go to **Settings →
-   Scan QR Code**, and point the camera at it.
+1. Download `Discy-…-windows-x64-setup.exe` from the
+   [latest release](https://github.com/x2super/Discy/releases/latest).
+2. Run the setup installer. It installs per-user under
+   `%LOCALAPPDATA%\Programs\Discy` with no administrator prompt. Because the
+   installer is unsigned, Windows SmartScreen may show a warning: click
+   **More info** → **Run anyway**.
+3. Sign in by scanning the QR code with Discord on your phone (**Settings →
+   Scan QR Code**) or with a token.
 
-Rather skip the installer? The release has a portable ZIP too: extract it and
-double-click `yapfast.exe`.
+Prefer a portable build? Download `Discy-…-windows-x64.zip`, extract it, and
+run `discy.exe`.
 
-Yapfast starts with Windows and waits in the tray, so messages and calls still
-reach you. Untick that in the installer, or turn it off later in **Settings →
-Advanced**.
+Discy can optionally start with Windows in the system tray (configurable in
+the installer or **Settings → Advanced**).
 
 ### Linux
 
-It runs great on both X11 and Wayland, screen sharing too (Hyprland here).
-Every release has two packages, on the
-[latest release](https://github.com/yapfast/yapfast/releases/latest):
-
-- **AppImage**, `Yapfast-…-x86_64.AppImage`, for any distro with glibc 2.39 or
-  newer, like Ubuntu 24.04, Fedora 40 or Debian 13. Make it executable
-  (`chmod +x`, or "Allow executing" in its properties) and run it. It adds
-  itself to your app menu, and uses your own graphics driver, Mesa or NVIDIA.
-- **Arch package**, `yapfast-…-x86_64.pkg.tar.zst`. Install it with
-  `sudo pacman -U` and the file or its link. Rather build it yourself? The
-  [PKGBUILD](packaging/arch/PKGBUILD) builds the release's tag from source.
-
-Then link your account with the QR code, as on Windows.
-
-<details>
-<summary><b>With Nix</b></summary>
-
-<br>
-
-It's one command (pretty sure, anyway :D), and you get the same Discord-only
-app the releases ship, in your launcher:
-
-```sh
-nix profile add github:yapfast/yapfast#yapfast
-```
-
-It compiles from source, so give it a few minutes. An older glibc and no Nix?
-Then [build it yourself](#build-it-yourself).
-
-</details>
-
-### Updates
-
-Turn on **Check for updates** in **Settings → About**, and Yapfast tells you
-when a new release is out. The Windows installer's copy and the AppImage can
-then update themselves with **Update and restart**; they install only a
-release signed with Yapfast's key. Update the portable ZIP and the Arch
-package the way you installed them.
-
-### macOS
-
-Not yet, sorry :( I'd love to make one, but I don't own an Apple machine to
-test it on.
-
-<details>
-<summary><b>Nightly builds</b></summary>
-
-<br>
-
-Want what's on `main` right now, without waiting for a release or building it
-yourself? Every now and then I put out a nightly build of the Discord-only app.
-They're on the [releases page](https://github.com/yapfast/yapfast/releases),
-marked **Pre-release**, newest first, each with a list of what changed:
-
-- **Windows:** the portable ZIP. Extract it and double-click `yapfast.exe`.
-- **Linux:** the AppImage. `chmod +x` it and run it.
-- **Arch Linux:** the `.pkg.tar.zst`. Install it with `sudo pacman -U` and the
-  file or its link.
-
-They're untested between releases, so expect the odd rough edge.
-
-</details>
-
-## Other questions
-
-<details>
-<summary><b>What about Matrix?</b></summary>
-
-<br>
-
-Yapfast started as a [Matrix](https://matrix.org) client, and Matrix still
-works: encrypted rooms, Spaces as servers, and voice channels over MatrixRTC, in
-the same window as Discord. The release is Discord-only for now, so
-[build it yourself](#build-it-yourself) to get both.
-
-After that I'd like Telegram, Signal, WhatsApp, Instagram and Messenger in there
-too. No clue when, but hopefully at some point :p
-
-</details>
-
-<details>
-<summary><b>Why not Tauri?</b></summary>
-
-<br>
-
-Tauri apps run a website too; they just borrow your system's web view instead
-of shipping their own Chromium. The browser is the exact thing I wanted gone, so
-hell no.
-
-</details>
-
-<details>
-<summary><b>Why draw on the processor?</b></summary>
-
-<br>
-
-It already keeps a 180 Hz monitor fed, and it takes less memory. There's a GPU
-renderer too, behind **Render with the GPU** in Settings, if you'd rather use
-that.
-
-</details>
-
-<details>
-<summary><b>Can I use my Vencord plugins?</b></summary>
-
-<br>
-
-Nope. They need a JavaScript runtime, and Yapfast's insides look nothing like
-what they expect. Yapfast will get plugins of its own, though, and open source
-Vencord ones could be ported once it does.
-
-</details>
-
-<details>
-<summary><b>How is it different from Serein?</b></summary>
-
-<br>
-
-Serein draws with wgpu, which costs more memory before you've opened a single
-channel. Yapfast draws with iced, on the processor by default (WAY lighter) or
-the GPU if you ask. It also does Matrix (from source, for now), DeepFilterNet
-noise suppression on top of RNNoise, voice gates, and the cached GIF picker.
-It's still missing a few things, like media channels and activities.
-
-</details>
-
-<details>
-<summary><b>Did you use AI to write it?</b></summary>
-
-<br>
-
-Yep. Opus 5.5 wrote most of the code, and 6.1 Sol and 6 Astra did adversarial
-review and helped with the nastiest bugs (networking protocols mixed with VP8 is
-a bit much for a side project :D). It wasn't one prompt and done, though. I've
-used it every day for weeks, profiled it with perf, read the code, and bent the
-UX to my muscle memory, so switching over hurts as little as it can.
-
-</details>
+Build from source with Cargo or Nix (see [Build it yourself](#build-it-yourself)).
 
 ## Build it yourself
 
-On Windows, develop, build and test directly with Cargo. Install Visual
-Studio Build Tools with C++ and a Windows SDK, LLVM/Clang (including
-`clang-cl` and `libclang`) and NASM as described in the
-[native prerequisites](docs/building.md#windows), then run from the project
-folder in Developer PowerShell for VS:
+### Windows (Native Cargo + Inno Setup Installer)
+
+Install Visual Studio Build Tools (C++ & Windows SDK), LLVM/Clang
+(`clang-cl` and `libclang`), NASM, and optionally [Inno Setup 6](https://jrsoftware.org/isinfo.php)
+for compiling the Windows installer. See [docs/building.md#windows](docs/building.md#windows).
+
+From Developer PowerShell for VS:
 
 ```powershell
+# Development / fast build and tests
 cargo build --locked --profile fast
 cargo run --locked --profile fast -- --preview
 cargo test --locked --profile fast --workspace
+
+# Optimized release build (produces target\release\discy.exe)
+$env:YAPFAST_RELEASE = "1"
+cargo build --locked --release
 ```
 
-On Linux, use the pinned [Nix](https://nixos.org) environment, which brings
-the right Rust, Clang and native libraries. From the project folder:
+### Linux (Nix or Cargo)
 
 ```sh
-# Try the UI without an account
+# Preview UI without an account
 nix develop path:./nix --command cargo run --locked --profile fast -- --preview
 
-# Run it for real: Discord only, like the release
+# Run Discord release flavour
 nix develop path:./nix --command cargo run --locked --profile fast
 
-# With Matrix too
+# Run with Matrix support too
 nix develop path:./nix --command cargo run --locked --profile fast --features matrix
 
-# Windows installer and ZIP, cross-built from Linux, into target/dist
-nix develop path:./nix#windows --command scripts/build-windows
-
-# Format, lint and test everything
+# Full checks
 scripts/check --fast
 ```
 
-The Windows commands use the Rust version pinned in `rust-toolchain.toml`.
-See [Contributing](CONTRIBUTING.md#build-and-test) for the complete checks
-on each system and for running against the fake Discord server.
-
-### Without Nix
-
-On Linux, `cargo run --locked` works without Nix too, with rustup, which
-installs Rust 1.100 from `rust-toolchain.toml`, and the tools and libraries
-the Arch package builds with, in `packaging/arch/PKGBUILD`. Cargo downloads
-the same libwebrtc archive the Nix shell pins.
-
 | Read this | For |
 | --- | --- |
-| [Contributing](CONTRIBUTING.md) | What a pull request needs: checks, memory numbers, commit style |
-| [Development](docs/development.md) | Day-to-day work: the preview, local Matrix and LiveKit servers, voice tests |
-| [Architecture](docs/architecture.md) | How `yapfast-core` and the window fit together |
+| [Contributing](CONTRIBUTING.md) | Checks, memory targets, commit style |
+| [Development](docs/development.md) | Preview mode, local test servers, voice tests |
+| [Architecture](docs/architecture.md) | How `yapfast-core` and the iced frontend fit together |
 | [Building](docs/building.md) | Toolchain, Cargo features, checks, releases |
-| [Discord](docs/discord/README.md) | What's done, what's next, and the fake server the tests use |
+| [Discord](docs/discord/README.md) | Discord protocol notes and fake server tests |
 | [Voice](docs/voice.md) | Calls, devices and audio processing |
-| [Windows](docs/windows-beta.md) | Packaging, the installer and Windows checks |
-| [Measurements](docs/measurements/README.md) | How memory and CPU are measured |
+| [Windows](docs/windows-beta.md) | Packaging, installer and Windows checks |
+| [Measurements](docs/measurements/README.md) | Memory and CPU benchmarks |
 
 ## License
 
-Yapfast is free software under the [GNU General Public License](LICENSE),
-version 3 or later. Builds with Matrix also include MatrixRTC libraries under
-the AGPL. Every release carries its dependencies' own licenses. Take it, I
-don't even care, baka.
+Discy is free software under the [GNU General Public License](LICENSE),
+version 3 or later (`GPL-3.0-or-later`). Builds with Matrix also include
+MatrixRTC libraries under the AGPL.
 
-## Thanks
+## Credits & Upstream
 
-Yapfast speaks to Discord the way its own apps do, as documented by
-[Discord Userdoccers](https://docs.discord.food), a community effort to
-document the user side of Discord's API. Thanks to everyone who writes it <3
+Discy is built on [iced](https://iced.rs), [LiveKit](https://livekit.io) / WebRTC,
+[DeepFilterNet](https://github.com/Rikorose/DeepFilterNet), and Discord API
+documentation from [Discord Userdoccers](https://docs.discord.food).
 
-It stands on [iced](https://iced.rs), [LiveKit](https://livekit.io) and WebRTC,
-[matrix-rust-sdk](https://github.com/matrix-org/matrix-rust-sdk) and
-[DeepFilterNet](https://github.com/Rikorose/DeepFilterNet). My patches to
-iced live in [`vendor/`](vendor), with the rest of the code.
+---
 
-<sub>Yapfast isn't affiliated with or endorsed by Discord Inc. Discord is a
-trademark of Discord Inc.</sub>
+<p align="center">
+  <sub>
+    <b>Forked from <a href="https://github.com/yapfast/yapfast">Yapfast</a></b> (<a href="https://github.com/yapfast/yapfast">github.com/yapfast/yapfast</a>), licensed under GPL-3.0-or-later.<br>
+    Maintained at <a href="https://github.com/x2super/Discy">github.com/x2super/Discy</a> by <a href="https://github.com/x2super">x2super</a>.<br>
+    Discy is not affiliated with or endorsed by Discord Inc. Discord is a trademark of Discord Inc.
+  </sub>
+</p>

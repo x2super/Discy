@@ -764,7 +764,7 @@ pub fn composer_look(ctx: crate::ctx::Ctx<'_>) -> Look {
     } else if locked {
         ("", false)
     } else if discord && !state.discord_online {
-        ("Discord is disconnected. Yapfast is reconnecting.", false)
+        ("Discord is disconnected. Discy is reconnecting.", false)
     } else if discord_only {
         ("", false)
     } else if discord {

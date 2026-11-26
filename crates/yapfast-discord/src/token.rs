@@ -28,7 +28,7 @@ use keyring::Entry;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
-const SERVICE: &str = "io.github.yapfast.Yapfast";
+const SERVICE: &str = "io.github.discy.Discy";
 /// The linked accounts' ids, and which one is active.
 const INDEX: &str = "discord-accounts";
 /// The start of each account's credential, which its id ends.

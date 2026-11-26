@@ -340,7 +340,7 @@ impl Staged {
         let metadata = std::fs::metadata(&path)
             .ok()
             .filter(std::fs::Metadata::is_file)
-            .ok_or_else(|| format!("Yapfast could not read {name}."))?;
+            .ok_or_else(|| format!("Discy could not read {name}."))?;
         if metadata.len() > limit {
             return Err(format!(
                 "{name} is {}; files here can be up to {}.",
@@ -3230,6 +3230,12 @@ pub enum DiscordCommand {
         preview: Box<InvitePreview>,
         from_link: bool,
     },
+    /// Create a new Discord server named `name`.
+    /// [`Event::CreateCaptcha`] follows for each captcha Discord asks for
+    /// first, and then [`Event::ServerCreated`].
+    CreateServer {
+        name: String,
+    },
     /// Look up a Discord server's scheduled event by its server and
     /// event ids, with whether this account is interested in it.
     /// [`Event::EventResolved`] follows.
@@ -4833,6 +4839,16 @@ pub enum Event {
         code: String,
         result: Result<JoinedServer, String>,
     },
+    /// The address of the page with a captcha Discord asked for before
+    /// creating a server.
+    CreateCaptcha {
+        page: String,
+    },
+    /// The server [`DiscordCommand::CreateServer`] created, by its server id,
+    /// or why it didn't.
+    ServerCreated {
+        result: Result<String, String>,
+    },
     /// What the scheduled event [`DiscordCommand::ResolveEvent`] looked
     /// up by its id shows, or why Discord showed nothing.
     EventResolved {
@@ -5576,7 +5592,7 @@ pub async fn run(
     #[cfg(not(feature = "matrix"))]
     {
         let refused = match start {
-            Start::Login { .. } => Some("This build of Yapfast has no Matrix sign-in."),
+            Start::Login { .. } => Some("This build of Discy has no Matrix sign-in."),
             #[cfg(feature = "discord")]
             Start::Restore if discord.is_none() => Some(
                 discord_error
@@ -5584,7 +5600,7 @@ pub async fn run(
                     .unwrap_or("Link your Discord account to sign in."),
             ),
             #[cfg(not(feature = "discord"))]
-            Start::Restore => Some("This build of Yapfast has no networks."),
+            Start::Restore => Some("This build of Discy has no networks."),
             #[allow(
                 unreachable_patterns,
                 reason = "reached in builds without one of the networks"
@@ -5604,7 +5620,7 @@ pub async fn run(
     };
     let Ok(mut voice) = voice::Controller::start_remembering(calls, Some(remembered)) else {
         let _ = events.send(Event::Error(
-            "Could not start the voice worker. Restart Yapfast and retry.".into(),
+            "Could not start the voice worker. Restart Discy and retry.".into(),
         ));
         return;
     };

@@ -193,7 +193,7 @@ impl<'a> View<'a> {
         if !modal.supported {
             fields = fields.push(crate::form::error(
                 theme,
-                "This form has a part Yapfast can't fill yet. Use it in Discord.",
+                "This form has a part Discy can't fill yet. Use it in Discord.",
             ));
         }
         let mut body = column![
@@ -273,7 +273,7 @@ impl<'a> View<'a> {
                 ),
                 None => Space::new().into(),
             },
-            UNSUPPORTED => text("Yapfast can't fill this part yet.")
+            UNSUPPORTED => text("Discy can't fill this part yet.")
                 .size(14)
                 .color(theme.secondary)
                 .into(),

@@ -378,7 +378,7 @@ pub fn command(
             None => {
                 let _ = events.send(Event::RoomError {
                     room: room.clone(),
-                    message: "Yapfast couldn't find that message.".into(),
+                    message: "Discy couldn't find that message.".into(),
                 });
                 let _ = events.send(Event::HistoryLoaded {
                     room,

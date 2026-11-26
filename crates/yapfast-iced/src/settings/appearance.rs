@@ -585,7 +585,7 @@ impl Settings {
                 let file = rfd::AsyncFileDialog::new()
                     .set_title("Export theme")
                     .set_file_name(file_name)
-                    .add_filter("Yapfast theme", &["json"])
+                    .add_filter("Discy theme", &["json"])
                     .save_file()
                     .await?;
                 let result = std::fs::write(file.path(), text).map_err(|error| error.to_string());
@@ -736,7 +736,7 @@ fn import_dialog() -> iced::Task<Message> {
         async {
             rfd::AsyncFileDialog::new()
                 .set_title("Import theme")
-                .add_filter("Yapfast theme", &["json"])
+                .add_filter("Discy theme", &["json"])
                 .pick_file()
                 .await
                 .map(|file| file.path().to_owned())
@@ -917,7 +917,7 @@ impl<'a> Page<'a> {
                 ))),
             )
             .description(
-                "Messages, names, channels and what you type use Yapfast's own font in every theme. The theme's art, colours and layout stay.",
+                "Messages, names, channels and what you type use Discy's own font in every theme. The theme's art, colours and layout stay.",
             )
             .view(self.cx.look),
             switch(
@@ -1341,7 +1341,7 @@ impl<'a> Page<'a> {
                 super::pages::Pref::SystemTitleBar(!system),
             ))),
         )
-        .description("Your desktop draws the window's title bar and buttons, as on its other windows. Off, Yapfast draws its own.")
+        .description("Your desktop draws the window's title bar and buttons, as on its other windows. Off, Discy draws its own.")
         .view(self.cx.look)
     }
 }

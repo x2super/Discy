@@ -410,7 +410,7 @@ impl AppState {
                         .into()
                     })
             }
-            _ => Err("Yapfast can't fill this option yet".into()),
+            _ => Err("Discy can't fill this option yet".into()),
         }
     }
 

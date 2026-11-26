@@ -108,12 +108,12 @@ async fn experiment(
 pub(crate) async fn require_trusted_encrypted_room(room: &Room) -> Result<()> {
     ensure!(
         room.latest_encryption_state().await?.is_encrypted(),
-        "Yapfast calls require an encrypted room; upgrade encryption explicitly first"
+        "Discy calls require an encrypted room; upgrade encryption explicitly first"
     );
     let client = room.client();
     ensure!(
         client.supports_sticky_events().await?,
-        "This homeserver doesn't support sticky events (MSC4354), which Yapfast voice channels need. Ask its administrator to enable them (Synapse: experimental_features.msc4354_enabled), or use another homeserver."
+        "This homeserver doesn't support sticky events (MSC4354), which Discy voice channels need. Ask its administrator to enable them (Synapse: experimental_features.msc4354_enabled), or use another homeserver."
     );
     let user = client.user_id().context("sign in before joining voice")?;
     let device = client.device_id().context("sign in before joining voice")?;
@@ -353,7 +353,7 @@ pub(crate) async fn publish_tone_while(
 ) -> Result<Tone> {
     let source = NativeAudioSource::new(AudioSourceOptions::default(), 48_000, 1, 50);
     let track = LocalAudioTrack::create_audio_track(
-        "Yapfast synthetic test",
+        "Discy synthetic test",
         RtcAudioSource::Native(source.clone()),
     );
     call.session()

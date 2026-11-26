@@ -67,7 +67,7 @@ impl<'a> Page<'a> {
             parts.push(form::note(
                 theme,
                 format!(
-                    "You installed Yapfast with {}, so update it there.",
+                    "You installed Discy with {}, so update it there.",
                     shown.manager
                 ),
             ));
@@ -75,7 +75,7 @@ impl<'a> Page<'a> {
         let status = match shown.status {
             UpdateStatus::Checking => "Checking for updates…".to_owned(),
             UpdateStatus::Current => "You're up to date.".to_owned(),
-            UpdateStatus::Available => format!("Yapfast {} is available.", shown.latest),
+            UpdateStatus::Available => format!("Discy {} is available.", shown.latest),
             UpdateStatus::Skipped => format!(
                 "You skipped {}. We'll tell you about the next one.",
                 shown.latest

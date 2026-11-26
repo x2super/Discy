@@ -50,7 +50,7 @@ pub const ITALIC: Font = Font {
 };
 
 /// The family name of the Twemoji font `crates/yapfast-iced/build.rs` makes.
-pub const TWEMOJI: &str = "Yapfast Twemoji";
+pub const TWEMOJI: &str = "Discy Twemoji";
 
 const DM_SANS: &[u8] = include_bytes!("../fonts/DMSans[opsz,wght].ttf");
 /// Its italic, for Markdown's emphasis.
@@ -311,7 +311,7 @@ fn alias(language: &'static str) -> &'static &'static str {
     if let Some((_, alias)) = aliases.iter().find(|(known, _)| *known == language) {
         return alias;
     }
-    let name: &'static str = Box::leak(format!("Yapfast fallback {language}").into_boxed_str());
+    let name: &'static str = Box::leak(format!("Discy fallback {language}").into_boxed_str());
     let alias: &'static &'static str = Box::leak(Box::new(name));
     aliases.push((language, alias));
     alias
@@ -880,7 +880,7 @@ pub enum ThemeFontError {
 impl std::fmt::Display for ThemeFontError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         formatter.write_str(match self {
-            Self::NotAFont => "isn't a font Yapfast can draw with",
+            Self::NotAFont => "isn't a font Discy can draw with",
             Self::Unnamed => "has no family name to draw it by",
         })
     }

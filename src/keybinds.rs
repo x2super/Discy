@@ -358,7 +358,7 @@ impl Watcher {
         {
             let _ = (runtime, sink);
             report(Status {
-                reach: Reach::Focused("Yapfast can't watch keys in other apps on this system yet"),
+                reach: Reach::Focused("Discy can't watch keys in other apps on this system yet"),
                 given: HashMap::new(),
             });
         }
@@ -461,7 +461,7 @@ mod linux {
                             );
                             report(Status {
                                 reach: Reach::Focused(
-                                    "Your desktop doesn't offer Yapfast global shortcuts",
+                                    "Your desktop doesn't offer Discy global shortcuts",
                                 ),
                                 given: HashMap::new(),
                             });
@@ -480,7 +480,7 @@ mod linux {
                 Err(error) => {
                     tracing::info!(error = format!("{error:#}"), "no global keybinds on X11");
                     report(Status {
-                        reach: Reach::Focused("Yapfast couldn't watch keys in other apps"),
+                        reach: Reach::Focused("Discy couldn't watch keys in other apps"),
                         given: HashMap::new(),
                     });
                     None
@@ -724,7 +724,7 @@ mod linux {
                             Err(error) => {
                                 tracing::warn!(%error, "lost the X server's keys");
                                 report(Status {
-                                    reach: Reach::Focused("Yapfast lost the X server's keys"),
+                                    reach: Reach::Focused("Discy lost the X server's keys"),
                                     given: HashMap::new(),
                                 });
                                 break;
@@ -1224,7 +1224,7 @@ mod windows {
                     tracing::warn!("Windows didn't install the keybind hooks");
                     report(Status {
                         reach: Reach::Focused(
-                            "Windows didn't let Yapfast watch keys in other apps",
+                            "Windows didn't let Discy watch keys in other apps",
                         ),
                         given: HashMap::new(),
                     });

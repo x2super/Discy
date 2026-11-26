@@ -90,7 +90,7 @@ fn interact(
                         let name = path.file_name().unwrap_or_default().to_string_lossy();
                         let _ = events.send(Event::InteractionFailed {
                             nonce,
-                            reason: format!("Yapfast could not read {name}."),
+                            reason: format!("Discy could not read {name}."),
                         });
                         return;
                     }
@@ -146,7 +146,7 @@ fn run_command(run: CommandRun, discord: Result<&Discord, &str>, events: &Unboun
                     let name = path.file_name().unwrap_or_default().to_string_lossy();
                     let _ = events.send(Event::InteractionFailed {
                         nonce,
-                        reason: format!("Yapfast could not read {name}."),
+                        reason: format!("Discy could not read {name}."),
                     });
                     return;
                 }
@@ -297,7 +297,7 @@ pub(super) fn live(live: Live, events: &UnboundedSender<Event>) -> Option<Live> 
         Live::InteractionModal(form) => Event::InteractionModal(form),
         Live::InteractionPage(page) => Event::InteractionFailed {
             nonce: page["nonce"].as_str().unwrap_or_default().to_owned(),
-            reason: "This app opens a page Yapfast can't show. Use it in Discord.".into(),
+            reason: "This app opens a page Discy can't show. Use it in Discord.".into(),
         },
         // Only the newest autocomplete's, which [`autocomplete`] passes on.
         Live::AutocompleteChoices { .. } => return None,

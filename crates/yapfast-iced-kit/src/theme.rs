@@ -952,7 +952,7 @@ impl Theme {
     pub fn worked_out(self) -> Self {
         let dark = self.dark;
         let iced = iced::Theme::custom(
-            format!("Yapfast {}", self.id),
+            format!("Discy {}", self.id),
             iced::theme::Palette {
                 background: self.chat,
                 text: self.text,

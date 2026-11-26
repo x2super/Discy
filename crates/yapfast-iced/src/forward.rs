@@ -153,7 +153,7 @@ impl<'a> View<'a> {
             } else if !forwarding.query.is_empty() {
                 "No conversations match."
             } else {
-                "There's nowhere to forward to yet. Yapfast forwards Matrix messages only \
+                "There's nowhere to forward to yet. Discy forwards Matrix messages only \
                  into encrypted conversations."
             };
             list = list.push(container(text(empty).size(14).color(theme.secondary)).padding(8));

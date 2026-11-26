@@ -457,12 +457,12 @@ impl App {
                 Task::batch([open, closed, self.sync()])
             }
             Heard::Launched { token, link } => {
-                tracing::info!("Yapfast started again; showing the window");
+                tracing::info!("Discy started again; showing the window");
                 if let Some(link) = link {
                     if yapfast_core::discord::discord_route(&link).is_some() {
                         self.shell.pending_link = Some(link);
                     } else {
-                        tracing::warn!("a later start handed Yapfast a link it can't open");
+                        tracing::warn!("a later start handed Discy a link it can't open");
                     }
                 }
                 self.shell.token = token;
@@ -902,9 +902,9 @@ impl App {
             .map(|room| room.mentions)
             .sum();
         match waiting {
-            0 => "Yapfast".to_owned(),
-            1..=99 => format!("({waiting}) Yapfast"),
-            _ => "(99+) Yapfast".to_owned(),
+            0 => "Discy".to_owned(),
+            1..=99 => format!("({waiting}) Discy"),
+            _ => "(99+) Discy".to_owned(),
         }
     }
 

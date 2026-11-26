@@ -223,8 +223,8 @@ pub fn note() -> String {
         .count();
     match (failed, loaded.registered.is_empty()) {
         (0, _) => String::new(),
-        (1, true) => "The font file didn't load, so Yapfast uses its own font.".into(),
-        (_, true) => "None of the font files loaded, so Yapfast uses its own font.".into(),
+        (1, true) => "The font file didn't load, so Discy uses its own font.".into(),
+        (_, true) => "None of the font files loaded, so Discy uses its own font.".into(),
         (1, false) => "One font file didn't load. The others are in use.".into(),
         (_, false) => format!("{failed} font files didn't load. The others are in use."),
     }
@@ -327,7 +327,7 @@ fn register(
     Ok(faces)
 }
 
-const NOT_A_FONT: &str = "Not a font file. Yapfast reads TTF, OTF, TTC and WOFF.";
+const NOT_A_FONT: &str = "Not a font file. Discy reads TTF, OTF, TTC and WOFF.";
 const NOT_USABLE: &str = "Not a usable font.";
 const WOFF2: &str = "WOFF2 isn't supported. Use the WOFF, TTF or OTF version of the font.";
 const UNREADABLE: &str = "The file can't be read.";

@@ -847,6 +847,8 @@ impl Application {
         state.nav_forward.clear();
         state.navigation = Navigation::DirectMessages;
         state.dm_screen = Some(DmScreen::Friends);
+        self.pending_open = None;
+        self.pending_server = None;
         let mut effects = self.deselect();
         effects.extend(self.forget_discord());
         self.state.discord_linked = true;

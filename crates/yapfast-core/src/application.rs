@@ -69,7 +69,7 @@ pub use forum::{ForumInfo, ForumPost, ForumPosts, ForumView};
 pub use gifs::{AskedPicture, GifPicker, GifPicture, GifView};
 pub use gift::GiftDialog;
 pub use interactions::{InteractionModal, Interactions, ModalField, SelectChoice, SelectMenu};
-pub use join::JoinDialog;
+pub use join::{JoinDialog, JoinStep};
 pub use link_prompts::{EventPrompt, GiftPrompt, OAuthPrompt, permission_names};
 pub use members::{BAN_HISTORY, RoleChoice, TIMEOUT_TIMES};
 #[cfg(all(feature = "discord", any(test, feature = "test-fixtures")))]
@@ -129,7 +129,7 @@ const ARE_TYPING: &str = " are typing...";
 /// Discord's client starts a slowmode's wait this much past its length.
 const SLOWMODE_MARGIN_MS: u64 = 100;
 
-const STOPPED: &str = "The connection has stopped. Restart Yapfast to restore your session.";
+const STOPPED: &str = "The connection has stopped. Restart Discy to restore your session.";
 
 /// Reactions offered before someone has used any, in order.
 pub const DEFAULT_REACTIONS: [&str; 4] = ["👍", "❤️", "😂", "🎉"];
@@ -2271,13 +2271,16 @@ pub enum Action {
         user: String,
         server: String,
     },
-    /// Open Join a Server; look up the invite in what was typed or pasted
-    /// into it; open it for a clicked invite link, by its code; join by
+    /// Open Add a Server (Create a Server / Join a Server choice), switch
+    /// its page, create a server, join directly from what was typed or
+    /// pasted, open it for a clicked invite link, by its code; join by
     /// the invite it shows, or open the server for a member; open the
     /// captcha Discord asked for again; open the server's form in the
     /// browser; or close it.
     OpenJoinServer,
-    FindInvite(String),
+    SetJoinStep(JoinStep),
+    CreateServer(String),
+    JoinInvite(String),
     OpenInviteLink(String),
     JoinServer,
     OpenJoinCaptcha,
@@ -2727,6 +2730,8 @@ pub struct Application {
     searched: HashSet<String>,
     /// A conversation to open once it's listed, such as a DM just started.
     pending_open: Option<String>,
+    /// A server just created, to open once it's listed.
+    pending_server: Option<String>,
     /// A thread to show beside the selected channel once it's listed.
     pending_aside: Option<String>,
     /// A thread just started, whose first message, its draft, goes once
@@ -3243,6 +3248,12 @@ impl Application {
             if std::mem::take(&mut self.pending_call) {
                 effects.extend(self.dispatch(Action::RequestJoinVoice(room)));
             }
+        }
+        if let Some(server) = self
+            .pending_server
+            .take_if(|server| self.state.servers.iter().any(|listed| &listed.id == server))
+        {
+            effects.extend(self.dispatch(Action::Navigate(Navigation::Server(server))));
         }
         if let Some(room) = self
             .pending_aside
@@ -4021,7 +4032,9 @@ impl Application {
             }
             Action::InviteToServer { user, server } => self.invite_to_server(user, server),
             Action::OpenJoinServer => self.open_join(),
-            Action::FindInvite(typed) => self.find_invite(typed),
+            Action::SetJoinStep(step) => self.set_join_step(step),
+            Action::CreateServer(name) => self.create_server(name),
+            Action::JoinInvite(typed) => self.join_invite(typed),
             Action::OpenInviteLink(code) => self.open_invite_link(code),
             Action::JoinServer => self.join_server(),
             Action::OpenJoinCaptcha => self.open_join_captcha(),
@@ -4832,6 +4845,8 @@ impl Application {
             }
             Event::InviteSent { result, .. } => self.invite_sent(result),
             Event::InviteResolved { code, result } => return self.invite_resolved(code, result),
+            Event::CreateCaptcha { page } => return self.create_captcha(page),
+            Event::ServerCreated { result } => return self.server_created(result),
             Event::JoinCaptcha { code, page } => return self.join_captcha(code, page),
             Event::ServerJoined { code, result } => return self.server_joined(code, result),
             Event::OAuthResolved { query, result } => return self.oauth_resolved(query, result),

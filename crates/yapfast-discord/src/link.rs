@@ -70,7 +70,7 @@ fn route(url: &Url) -> Option<Route> {
     if matches!(
         segments.as_slice(),
         ["oauth2", "authorize"] | ["api", "oauth2", "authorize"]
-    ) && matches!(url.scheme(), "http" | "https" | "discord" | "yapfast")
+    ) && matches!(url.scheme(), "http" | "https" | "discord" | "discy" | "yapfast")
     {
         if matches!(url.scheme(), "http" | "https") && !web_host(url) {
             return None;
@@ -101,7 +101,7 @@ fn route(url: &Url) -> Option<Route> {
             }
             from_segments(&segments)
         }
-        "discord" | "yapfast" => {
+        "discord" | "discy" | "yapfast" => {
             match url.host_str() {
                 Some("-") | None => {}
                 Some(host) => segments.insert(0, host),

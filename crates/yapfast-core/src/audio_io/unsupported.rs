@@ -6,7 +6,7 @@ use anyhow::{Result, bail};
 
 use super::Format;
 
-const UNSUPPORTED: &str = "Yapfast has no sound on this system yet.";
+const UNSUPPORTED: &str = "Discy has no sound on this system yet.";
 
 #[cfg_attr(not(feature = "discord"), allow(dead_code))]
 pub fn raise_priority(_: super::Priority) -> Result<&'static str, String> {
@@ -61,5 +61,5 @@ pub fn others(
     _: super::Hear,
     _: std::sync::Arc<std::sync::atomic::AtomicBool>,
 ) -> Result<std::thread::JoinHandle<()>> {
-    bail!("Yapfast shares sound on Linux only for now")
+    bail!("Discy shares sound on Linux only for now")
 }

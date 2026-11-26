@@ -10,7 +10,7 @@ use iced::{
     widget::Id,
 };
 use yapfast_core::{
-    application::{ChannelAsk, ChannelDialog, InviteDialog, JoinDialog},
+    application::{ChannelAsk, ChannelDialog, InviteDialog, JoinDialog, JoinStep},
     chat::{ChannelKind, ChannelSettings, Event, InvitePreview},
     yapfast_discord::{
         ready::permission,
@@ -238,6 +238,7 @@ fn join_a_server_shows_the_invites_server_and_a_link_opens_it() {
     // A clicked invite link opens the dialog rather than the browser.
     let _ = crate::links::follow_link(&mut app, "https://discord.gg/abc", Point::new(400.0, 300.0));
     let join = app.client.state().join.clone().expect("open");
+    assert_eq!(join.step, JoinStep::Join);
     assert!(join.from_link && join.resolving);
     assert_eq!(join.code.as_deref(), Some("abc"));
     assert!(shows(&app, "You've been invited to join a server"));
@@ -246,16 +247,12 @@ fn join_a_server_shows_the_invites_server_and_a_link_opens_it() {
     press(&mut app, key::Named::Escape);
     assert!(app.client.state().join.is_none());
 
-    // The rail's button opens it with the field, which takes the keys.
-    let _ = app.update(Message::Rail(crate::rail::Event::Join));
-    assert!(shows(&app, "Join a Server") && shows(&app, "Find Invite"));
-    interact(&mut app, |ui| {
-        ui.click(Id::new("join-invite")).expect("the field");
-        ui.typewrite("abc");
-    });
+    // Once resolved, a clicked invite shows the server card and joins in-app.
     change(&mut app, |state| {
         state.join = Some(JoinDialog {
+            step: JoinStep::Join,
             code: Some("abc".into()),
+            from_link: true,
             preview: Some(InvitePreview {
                 code: "abc".into(),
                 server: "discord:20".into(),
@@ -272,17 +269,76 @@ fn join_a_server_shows_the_invites_server_and_a_link_opens_it() {
         });
     });
     for words in [
-        "Join a Server",
+        "You've been invited to join a server",
         "Builders",
         "7 online, 42 members",
-        "Join in Browser",
+        "Join Server",
     ] {
         assert!(shows(&app, words), "{words}");
     }
+    assert!(!shows(&app, "Join in Browser"));
     interact(&mut app, |ui| {
-        ui.click("Join in Browser").expect("Join in Browser");
+        ui.click("Join Server").expect("Join Server");
     });
-    assert!(app.client.state().join.is_none());
+    assert!(app.client.state().join.as_ref().expect("open").joining);
+}
+
+#[test]
+fn add_a_server_choice_switches_between_create_and_direct_join() {
+    let (mut app, _folder) = discord_server(0, |_, _| {});
+    let _ = app.update(Message::Rail(crate::rail::Event::Join));
+    for words in ["Add a Server", "Create a Server", "Join a Server"] {
+        assert!(shows(&app, words), "{words}");
+    }
+    assert!(!shows(&app, "Find Invite"));
+
+    // Create a Server path: pick Create, type a name, Create starts creating.
+    interact(&mut app, |ui| {
+        ui.click("Create a Server").expect("Create a Server");
+    });
+    for words in ["Create a Server", "SERVER NAME", "Create", "Back"] {
+        assert!(shows(&app, words), "{words}");
+    }
+    interact(&mut app, |ui| {
+        ui.click(Id::new("create-server-name"))
+            .expect("the create field");
+        ui.typewrite("My Club");
+        ui.click("Create").expect("Create");
+    });
+    assert!(app.client.state().join.as_ref().expect("open").creating);
+
+    // Returning via Back and picking Join shows direct Join Server without Find Invite.
+    change(&mut app, |state| {
+        state.join = Some(JoinDialog {
+            step: JoinStep::Create,
+            ..Default::default()
+        });
+    });
+    interact(&mut app, |ui| {
+        ui.click("Back").expect("Back");
+    });
+    assert!(shows(&app, "Add a Server"));
+    interact(&mut app, |ui| {
+        ui.click("Join a Server").expect("Join a Server");
+    });
+    for words in ["Join a Server", "INVITE LINK", "Join Server", "Back"] {
+        assert!(shows(&app, words), "{words}");
+    }
+    assert!(!shows(&app, "Find Invite"));
+    interact(&mut app, |ui| {
+        ui.click(Id::new("join-invite")).expect("the field");
+        ui.typewrite("two words");
+        ui.click("Join Server").expect("Join Server");
+    });
+    assert!(
+        app.client
+            .state()
+            .join
+            .as_ref()
+            .expect("open")
+            .error
+            .is_some()
+    );
 }
 
 #[test]

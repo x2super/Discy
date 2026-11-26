@@ -897,7 +897,7 @@ pub(super) fn read_outlines(
         for (name, value) in object(borders, &here)? {
             let at = format!("{here}.{name}");
             let Some(place) = BorderPlace::named(name) else {
-                notes.push(format!("\"{at}\" isn't an outline Yapfast dashes; ignored"));
+                notes.push(format!("\"{at}\" isn't an outline Discy dashes; ignored"));
                 continue;
             };
             layout

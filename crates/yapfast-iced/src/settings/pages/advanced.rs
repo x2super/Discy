@@ -21,14 +21,14 @@ impl<'a> Page<'a> {
         if let Some(start) = platform.autostart {
             parts.push(self.flip(
                 "Start when you sign in",
-                "Yapfast starts in the system tray when you sign in to your computer, so messages and calls reach you.",
+                "Discy starts in the system tray when you sign in to your computer, so messages and calls reach you.",
                 start,
                 Pref::StartOnSignIn,
             ));
         }
         if let Some(links) = platform.discord_links {
             parts.push(self.flip(
-                "Open Discord links in Yapfast",
+                "Open Discord links in Discy",
                 "discord:// links from other apps and shortcuts open here instead of Discord. Turning it off gives them back to the app that had them.",
                 links,
                 Pref::DiscordLinks,
@@ -39,22 +39,22 @@ impl<'a> Page<'a> {
             self.flip(
                 "Close to tray",
                 if tray {
-                    "Closing the window keeps Yapfast running in the system tray, with any call. Quit from the tray icon's menu."
+                    "Closing the window keeps Discy running in the system tray, with any call. Quit from the tray icon's menu."
                 } else {
-                    "No system tray is running, so closing the window quits Yapfast."
+                    "No system tray is running, so closing the window quits Discy."
                 },
                 prefs.close_to_tray.unwrap_or(true),
                 Pref::CloseToTray,
             ),
             self.flip(
                 "Allow multiple windows",
-                "Starting Yapfast while it runs opens another Yapfast, with its own window and tray icon. Off, it brings the open window forward.",
+                "Starting Discy while it runs opens another Discy, with its own window and tray icon. Off, it brings the open window forward.",
                 prefs.multiple_windows,
                 Pref::MultipleWindows,
             ),
             self.flip(
                 "Render with the GPU",
-                "Hardware acceleration. Off, Yapfast draws on the processor, which uses about half the memory.",
+                "Hardware acceleration. Off, Discy draws on the processor, which uses about half the memory.",
                 prefs.gpu_rendering,
                 Pref::GpuRendering,
             ),
@@ -63,7 +63,7 @@ impl<'a> Page<'a> {
         parts.extend([
             self.flip(
                 "Encode streams with the GPU",
-                "Screen sharing uses the graphics card's video encoder, which takes almost no processor time and looks better at low bitrates. Off, or without one, Yapfast encodes on the processor.",
+                "Screen sharing uses the graphics card's video encoder, which takes almost no processor time and looks better at low bitrates. Off, or without one, Discy encodes on the processor.",
                 self.cx.layout.voice.gpu_encoding.unwrap_or(true),
                 Pref::GpuEncoding,
             ),
@@ -91,14 +91,14 @@ impl<'a> Page<'a> {
         }
         let theme = self.cx.look.theme;
         let words = if gpu {
-            "Yapfast switches to the GPU when it restarts. Restarting leaves any call."
+            "Discy switches to the GPU when it restarts. Restarting leaves any call."
         } else {
-            "Yapfast switches to the processor when it restarts. Restarting leaves any call."
+            "Discy switches to the processor when it restarts. Restarting leaves any call."
         };
         let ink = crate::theme::rgb(theme.text);
         let restart = action(
             theme,
-            "Restart Yapfast",
+            "Restart Discy",
             Kind::Plain,
             Some(crate::app::settings(Event::Restart)),
         )

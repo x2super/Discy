@@ -60,7 +60,7 @@ pub use player::Player;
 /// one playing a watched stream, and Discord's own client and those built
 /// on it.
 fn is_discord_client(name: &str) -> bool {
-    if name == "Yapfast" {
+    if name == "Yapfast" || name == "Discy" {
         return true;
     }
     let name = name.to_lowercase();

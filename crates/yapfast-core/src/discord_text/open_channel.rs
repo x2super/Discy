@@ -739,7 +739,7 @@ impl OpenChannel {
             .into_iter()
             .map(|OutgoingFile { path, spoiler }| {
                 let metadata =
-                    std::fs::metadata(&path).map_err(|_| "Yapfast could not read a file.")?;
+                    std::fs::metadata(&path).map_err(|_| "Discy could not read a file.")?;
                 let name = path
                     .file_name()
                     .map(|name| name.to_string_lossy().into_owned())
@@ -815,7 +815,7 @@ impl OpenChannel {
                 for (path, name, spoiler) in files {
                     let data = tokio::fs::read(&path)
                         .await
-                        .map_err(|_| format!("Yapfast could not read {name}."))?;
+                        .map_err(|_| format!("Discy could not read {name}."))?;
                     read.push((upload_name(&name, spoiler), data));
                 }
                 let sending = yapfast_discord::api::Sending {
@@ -1447,7 +1447,7 @@ impl OpenChannel {
             let picture = discord
                 .download_now(&url, MAX_PREVIEW_DOWNLOAD_BYTES)
                 .await
-                .map_err(|_| "Yapfast couldn't copy this picture. Save it instead.");
+                .map_err(|_| "Discy couldn't copy this picture. Save it instead.");
             let _ = done.send(Done::Copied { room, picture });
         });
     }
@@ -1491,7 +1491,7 @@ impl OpenChannel {
                 .ok()
                 .flatten()
                 .map(Arc::new)
-                .ok_or("Yapfast can't show this image. Save it to open it elsewhere."),
+                .ok_or("Discy can't show this image. Save it to open it elsewhere."),
                 Err(error) => {
                     // The address stays out of the log: it names the attachment.
                     let status = error
@@ -1502,7 +1502,7 @@ impl OpenChannel {
                     Err(if stalled {
                         "Discord stopped sending this image. Try again."
                     } else {
-                        "Yapfast couldn't download this image from Discord. Try again."
+                        "Discy couldn't download this image from Discord. Try again."
                     })
                 }
             };

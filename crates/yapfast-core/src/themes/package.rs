@@ -1165,7 +1165,7 @@ const RETIRED_KEYS: [&str; 1] = ["cursors"];
 /// `variants.dark.cursors`).
 fn retired_note(place: &str) -> String {
     format!(
-        "\"{place}\": Yapfast doesn't use custom cursors; the system's cursor shows, and the theme's cursor files aren't installed"
+        "\"{place}\": Discy doesn't use custom cursors; the system's cursor shows, and the theme's cursor files aren't installed"
     )
 }
 
@@ -1224,7 +1224,7 @@ impl Package {
             .and_then(Value::as_u64)
             .ok_or_else(|| Error(format!("{MANIFEST} needs \"theme_api\": {THEME_API}")))?;
         if api != u64::from(THEME_API) {
-            bail!("this theme is for theme API {api}, and this Yapfast reads {THEME_API}");
+            bail!("this theme is for theme API {api}, and this Discy reads {THEME_API}");
         }
         let id = string(top, "id")?.ok_or_else(|| Error("it needs an \"id\"".into()))?;
         check_id(&id)?;
@@ -1280,7 +1280,7 @@ impl Package {
                 notes.push(retired_note(key));
             } else if !TOP_KEYS.contains(&key.as_str()) && !LAYER_KEYS.contains(&key.as_str()) {
                 notes.push(format!(
-                    "\"{key}\" isn't something this Yapfast reads; ignored"
+                    "\"{key}\" isn't something this Discy reads; ignored"
                 ));
             }
         }
@@ -1321,7 +1321,7 @@ impl Package {
                 });
                 if retired {
                     notes.push(format!(
-                        "\"sets.{name}\": its cursor changes are ignored; Yapfast doesn't use custom cursors"
+                        "\"sets.{name}\": its cursor changes are ignored; Discy doesn't use custom cursors"
                     ));
                 }
             }
@@ -1493,7 +1493,7 @@ impl Package {
                 notes.push(retired_note(&at(key)));
             } else if key != "base" && !LAYER_KEYS.contains(&key.as_str()) {
                 notes.push(format!(
-                    "\"{}\" isn't something this Yapfast reads; ignored",
+                    "\"{}\" isn't something this Discy reads; ignored",
                     at(key)
                 ));
             }
@@ -1667,7 +1667,7 @@ pub fn export(name: &str, author: &str, base: &str, dark: bool, colours: &[(&str
         "id": format!("local.{}", slug(name)),
         "name": name,
         "version": "1.0.0",
-        "description": format!("{name}, a colour theme made in Yapfast."),
+        "description": format!("{name}, a colour theme made in Discy."),
         "authors": if author.is_empty() { Vec::new() } else { vec![author] },
         "license": "CC0-1.0",
         "source": "",
@@ -2096,7 +2096,7 @@ pub(crate) fn paint_at(value: &Value, place: &str) -> Result<Paint, Error> {
     if text.trim_start().starts_with("linear(") {
         parse_linear(text).ok_or_else(|| {
             Error(format!(
-                "\"{place}\" isn't a gradient Yapfast reads: write linear(135deg, #ff71ce, #01cdfe)"
+                "\"{place}\" isn't a gradient Discy reads: write linear(135deg, #ff71ce, #01cdfe)"
             ))
         })
     } else {
@@ -2118,13 +2118,13 @@ fn read_colours(
             .find(|token| token == name)
         else {
             notes.push(format!(
-                "\"{place}.{name}\" isn't a colour Yapfast has; ignored"
+                "\"{place}.{name}\" isn't a colour Discy has; ignored"
             ));
             continue;
         };
         if LOCKED_COLOURS.contains(&token) {
             notes.push(format!(
-                "\"{place}.{name}\" can't be set: warnings and destructive actions keep Yapfast's own red"
+                "\"{place}.{name}\" can't be set: warnings and destructive actions keep Discy's own red"
             ));
             continue;
         }
@@ -2140,7 +2140,7 @@ fn read_colours(
             }
             parse_linear(text).ok_or_else(|| {
                 Error(format!(
-                    "\"{place}.{name}\" isn't a gradient Yapfast reads: write linear(135deg, #ff71ce, #01cdfe)"
+                    "\"{place}.{name}\" isn't a gradient Discy reads: write linear(135deg, #ff71ce, #01cdfe)"
                 ))
             })?
         } else {
@@ -2198,7 +2198,7 @@ fn read_shapes(
         }
         let Some(surface) = Surface::named(name) else {
             notes.push(format!(
-                "\"{place}.{name}\" isn't a surface Yapfast has; ignored"
+                "\"{place}.{name}\" isn't a surface Discy has; ignored"
             ));
             continue;
         };
@@ -2282,7 +2282,7 @@ fn read_paint(value: &Value, here: &str) -> Result<Paint, Error> {
     if text.trim_start().starts_with("linear(") {
         return parse_linear(text).ok_or_else(|| {
             Error(format!(
-                "\"{here}\" isn't a gradient Yapfast reads: write linear(135deg, #ff71ce, #01cdfe)"
+                "\"{here}\" isn't a gradient Discy reads: write linear(135deg, #ff71ce, #01cdfe)"
             ))
         });
     }
@@ -2365,7 +2365,7 @@ fn read_types(
     for (name, written) in object(value, place)? {
         let Some(role) = Role::named(name) else {
             notes.push(format!(
-                "\"{place}.{name}\" isn't a kind of text Yapfast has; ignored"
+                "\"{place}.{name}\" isn't a kind of text Discy has; ignored"
             ));
             continue;
         };
@@ -2446,7 +2446,7 @@ fn read_spacing(
         }
         let here = format!("{place}.{key}");
         let Some(&(_, low, high)) = Spacing::FIELDS.iter().find(|(name, ..)| name == key) else {
-            notes.push(format!("\"{here}\" isn't a spacing Yapfast has; ignored"));
+            notes.push(format!("\"{here}\" isn't a spacing Discy has; ignored"));
             continue;
         };
         let number = number(value, &here, (low, high))?;
@@ -2585,13 +2585,13 @@ fn read_animations(
         let slot_name = fields.get("slot").and_then(Value::as_str).unwrap_or("");
         let Some(slot) = Slot::named(slot_name) else {
             notes.push(format!(
-                "\"{at}.slot\" is \"{slot_name}\", which isn't a slot Yapfast has; that animation is left out"
+                "\"{at}.slot\" is \"{slot_name}\", which isn't a slot Discy has; that animation is left out"
             ));
             continue;
         };
         let property_name = fields.get("property").and_then(Value::as_str).unwrap_or("");
         let Some(property) = Property::named(property_name) else {
-            bail!("\"{at}.property\" is \"{property_name}\", which isn't one Yapfast animates");
+            bail!("\"{at}.property\" is \"{property_name}\", which isn't one Discy animates");
         };
         if !slot.properties().contains(&property) {
             let names: Vec<&str> = slot
@@ -2699,7 +2699,7 @@ fn read_effects(
     for (name, written) in object(value, place)? {
         let here = format!("{place}.{name}");
         let Some(slot) = TextSlot::named(name) else {
-            notes.push(format!("\"{here}\" isn't a text slot Yapfast has; ignored"));
+            notes.push(format!("\"{here}\" isn't a text slot Discy has; ignored"));
             continue;
         };
         let (effect_name, duration) = match written {
@@ -2743,7 +2743,7 @@ fn parts_notes(parts: &Value, notes: &mut Vec<String>) {
     for (name, part) in parts {
         if !PARTS.contains(&name.as_str()) {
             notes.push(format!(
-                "\"parts.{name}\" isn't a part Yapfast has; ignored"
+                "\"parts.{name}\" isn't a part Discy has; ignored"
             ));
             continue;
         }
@@ -2756,7 +2756,7 @@ fn parts_notes(parts: &Value, notes: &mut Vec<String>) {
             Some((major.parse::<u32>().ok()?, minor.parse::<u32>().ok()?))
         });
         let note = match (offered, wanted) {
-            (None, _) => format!("\"parts.{name}\" needs a later Yapfast; the stock {name} shows"),
+            (None, _) => format!("\"parts.{name}\" needs a later Discy; the stock {name} shows"),
             (Some(_), None) => {
                 format!("\"parts.{name}.contract\" is written as 1.0; the stock {name} shows")
             }
@@ -2765,7 +2765,7 @@ fn parts_notes(parts: &Value, notes: &mut Vec<String>) {
             {
                 format!(
                     "\"parts.{name}\" is built for contract {wanted_major}.{wanted_minor}, and this \
-                     Yapfast offers {major}.{minor}; the stock {name} shows"
+                     Discy offers {major}.{minor}; the stock {name} shows"
                 )
             }
             (Some(_), Some(_)) => continue,
@@ -2958,7 +2958,7 @@ mod tests {
         let notes = package.notes.join("\n");
         for expected in [
             "\"haptics\"",
-            "parts.message-row\" needs a later Yapfast",
+            "parts.message-row\" needs a later Discy",
             "parts.whole-window",
             "sparkle",
             "danger\" can't be set",

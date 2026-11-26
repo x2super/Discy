@@ -834,7 +834,7 @@ pub(super) fn read_chrome(
                 for (key, value) in object(value, &here)? {
                     let at = format!("{here}.{key}");
                     let Some(label) = Label::named(key) else {
-                        notes.push(format!("\"{at}\" isn't a label Yapfast shows; ignored"));
+                        notes.push(format!("\"{at}\" isn't a label Discy shows; ignored"));
                         continue;
                     };
                     let text = plain(value, &at, MAX_LABEL)?;
@@ -1000,7 +1000,7 @@ pub(super) fn read_chrome(
                                         chrome.tree.insert(list);
                                     }
                                     None => notes.push(format!(
-                                        "\"{at}[{index}]\" isn't a list Yapfast draws as a tree; ignored"
+                                        "\"{at}[{index}]\" isn't a list Discy draws as a tree; ignored"
                                     )),
                                 }
                             }
