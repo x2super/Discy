@@ -62,22 +62,75 @@ jobs:
           "YAPFAST_COMMIT_DATE=$date" | Out-File -FilePath $env:GITHUB_ENV -Append
           Write-Host "Publishing tag=$tag version=$version commit=$commit"
 
-      - name: Ensure LLVM, NASM, and Inno Setup 6
+      - name: Ensure LLVM (Clang 22+), NASM, and Inno Setup 6
         shell: pwsh
         run: |
-          if (-not (Test-Path "C:\Program Files\LLVM\bin\libclang.dll")) {
-            choco install llvm -y --no-progress
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsPath = ""
+          if (Test-Path $vswhere) {
+            $vsPath = (& $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath | Select-Object -First 1)
           }
+
+          function Get-ClangMajor([string]$binDir) {
+            $exe = Join-Path $binDir "clang-cl.exe"
+            if (-not (Test-Path $exe)) { return 0 }
+            $line = (& $exe --version 2>&1 | Select-Object -First 1)
+            Write-Host "Found $exe -> $line"
+            if ($line -match 'version (\d+)\.') { return [int]$Matches[1] }
+            return 0
+          }
+
+          $candidates = @()
+          if ($vsPath) { $candidates += (Join-Path $vsPath "VC\Tools\Llvm\x64\bin") }
+          $candidates += "C:\Program Files\LLVM\bin"
+
+          $llvmBin = $null
+          $bestMajor = 0
+          foreach ($dir in $candidates) {
+            $major = Get-ClangMajor $dir
+            if ($major -gt $bestMajor) {
+              $bestMajor = $major
+              $llvmBin = $dir
+            }
+          }
+
+          if ($bestMajor -lt 22) {
+            Write-Host "Upgrading LLVM via Chocolatey (current best Clang major: $bestMajor)..."
+            choco upgrade llvm -y --no-progress
+            $upgradedMajor = Get-ClangMajor "C:\Program Files\LLVM\bin"
+            if ($upgradedMajor -ge $bestMajor) {
+              $bestMajor = $upgradedMajor
+              $llvmBin = "C:\Program Files\LLVM\bin"
+            }
+          }
+
+          if (-not $llvmBin) {
+            throw "LLVM clang-cl.exe not found"
+          }
+          Write-Host "Selected LLVM bin: $llvmBin (Clang major: $bestMajor)"
+
+          if ($bestMajor -lt 22) {
+            Write-Host "Clang < 22 after upgrade; enabling _ALLOW_COMPILER_AND_STL_VERSION_MISMATCH"
+            "CXXFLAGS=-D_ALLOW_COMPILER_AND_STL_VERSION_MISMATCH" | Out-File -FilePath $env:GITHUB_ENV -Append
+          }
+
           if (-not (Get-Command nasm -ErrorAction SilentlyContinue)) {
             choco install nasm -y --no-progress
           }
           if (-not (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe")) {
             choco install innosetup -y --no-progress
           }
-          "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+
+          $libclangDir = if (Test-Path (Join-Path $llvmBin "libclang.dll")) {
+            $llvmBin
+          } else {
+            "C:\Program Files\LLVM\bin"
+          }
+          $llvmBin | Out-File -FilePath $env:GITHUB_PATH -Append
           "C:\Program Files\NASM" | Out-File -FilePath $env:GITHUB_PATH -Append
           "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Append
-          "LIBCLANG_PATH=C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "LLVM_BIN=$llvmBin" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "LIBCLANG_PATH=$libclangDir" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Install pinned Rust toolchain
         shell: pwsh
@@ -101,20 +154,22 @@ jobs:
         shell: pwsh
         run: |
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
-          $vsPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $vsPath = (& $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath | Select-Object -First 1)
           if (-not $vsPath) {
             throw "Visual Studio C++ Build Tools not found"
           }
           & "$vsPath\Common7\Tools\Launch-VsDevShell.ps1" -Arch amd64 -HostArch amd64 -SkipAutomaticLocation
-          $env:Path = "C:\Program Files\LLVM\bin;C:\Program Files\NASM;$env:Path"
-          $env:LIBCLANG_PATH = "C:\Program Files\LLVM\bin"
+          $env:Path = "$env:LLVM_BIN;C:\Program Files\NASM;$env:Path"
+          clang-cl --version
           cargo build --locked --release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Get-Item target\release\discy.exe | Select-Object Name, Length, LastWriteTime
 
       - name: Package Windows Setup Installer and Portable ZIP
         shell: pwsh
         run: |
           python scripts/package-windows-native.py --version "${{ steps.meta.outputs.version }}" --tag "${{ steps.meta.outputs.tag }}"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Get-ChildItem target\dist\discord | Select-Object Name, Length
           Get-Content target\dist\discord\SHA256SUMS.txt
 
