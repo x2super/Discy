@@ -1,0 +1,167 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to create or update (leave empty to use v<Cargo.toml version>)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_INCREMENTAL: 0
+  YAPFAST_RELEASE: "1"
+
+jobs:
+  windows-release:
+    name: Build & Publish Windows Release
+    runs-on: windows-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Determine release tag and version
+        id: meta
+        shell: pwsh
+        run: |
+          $cargoToml = Get-Content Cargo.toml -Raw
+          if ($cargoToml -notmatch '(?m)^version\s*=\s*"([^"]+)"') {
+            throw "Could not read version from Cargo.toml"
+          }
+          $crateVersion = $Matches[1]
+          $inputTag = "${{ github.event.inputs.tag }}".Trim()
+          if ("${{ github.ref_type }}" -eq "tag") {
+            $tag = "${{ github.ref_name }}"
+          } elseif ($inputTag -ne "") {
+            $tag = $inputTag
+          } else {
+            $tag = "v$crateVersion"
+          }
+          $version = $tag.TrimStart("v")
+          $commit = (git rev-parse HEAD).Trim()
+          $env:TZ = "UTC"
+          $date = (git log -1 --date=format-local:%Y-%m-%d --format=%cd).Trim()
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "commit=$commit" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "YAPFAST_COMMIT=$commit" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "YAPFAST_COMMIT_DATE=$date" | Out-File -FilePath $env:GITHUB_ENV -Append
+          Write-Host "Publishing tag=$tag version=$version commit=$commit"
+
+      - name: Ensure LLVM, NASM, and Inno Setup 6
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "C:\Program Files\LLVM\bin\libclang.dll")) {
+            choco install llvm -y --no-progress
+          }
+          if (-not (Get-Command nasm -ErrorAction SilentlyContinue)) {
+            choco install nasm -y --no-progress
+          }
+          if (-not (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
+          "C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_PATH -Append
+          "C:\Program Files\NASM" | Out-File -FilePath $env:GITHUB_PATH -Append
+          "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Append
+          "LIBCLANG_PATH=C:\Program Files\LLVM\bin" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Install pinned Rust toolchain
+        shell: pwsh
+        run: |
+          rustup show
+          rustc --version
+          cargo --version
+
+      - name: Cache Cargo registry and git dependencies
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+          key: windows-release-cargo-${{ hashFiles('rust-toolchain.toml', 'Cargo.lock') }}
+          restore-keys: |
+            windows-release-cargo-${{ hashFiles('rust-toolchain.toml') }}-
+
+      - name: Build Windows release binary (discy.exe)
+        shell: pwsh
+        run: |
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsPath = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          if (-not $vsPath) {
+            throw "Visual Studio C++ Build Tools not found"
+          }
+          & "$vsPath\Common7\Tools\Launch-VsDevShell.ps1" -Arch amd64 -HostArch amd64 -SkipAutomaticLocation
+          $env:Path = "C:\Program Files\LLVM\bin;C:\Program Files\NASM;$env:Path"
+          $env:LIBCLANG_PATH = "C:\Program Files\LLVM\bin"
+          cargo build --locked --release
+          Get-Item target\release\discy.exe | Select-Object Name, Length, LastWriteTime
+
+      - name: Package Windows Setup Installer and Portable ZIP
+        shell: pwsh
+        run: |
+          python scripts/package-windows-native.py --version "${{ steps.meta.outputs.version }}" --tag "${{ steps.meta.outputs.tag }}"
+          Get-ChildItem target\dist\discord | Select-Object Name, Length
+          Get-Content target\dist\discord\SHA256SUMS.txt
+
+      - name: Publish Full GitHub Release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.meta.outputs.tag }}
+          VERSION: ${{ steps.meta.outputs.version }}
+          COMMIT: ${{ steps.meta.outputs.commit }}
+        run: |
+          $setup = "target/dist/discord/Discy-$env:VERSION-windows-x64-setup.exe"
+          $zip = "target/dist/discord/Discy-$env:VERSION-windows-x64.zip"
+          $sums = "target/dist/discord/SHA256SUMS.txt"
+          $checksums = (Get-Content $sums -Raw).Trim()
+
+          @"
+          ## Discy $env:TAG
+
+          Native Rust Discord desktop client (forked from [Yapfast](https://github.com/yapfast/yapfast)).
+
+          ### Highlights
+          - Rebranded to **Discy** with native ``discy.exe``, Windows Setup Installer, system tray, and notifications
+          - Blue Discord-style Discy logo (``#5865F2``) and clean ``+`` server rail button
+          - Clicking ``+`` in the server rail opens **Add a Server** with **Create a Server** (in-app) and direct **Join a Server** (no separate Find Invite step)
+
+          ### Windows Downloads
+          - **Setup Installer (recommended):** ``Discy-$env:VERSION-windows-x64-setup.exe`` — per-user Windows 10/11 installer (no admin prompt required)
+          - **Portable ZIP:** ``Discy-$env:VERSION-windows-x64.zip`` — extract and run ``discy.exe``
+          - **Checksums:** ``SHA256SUMS.txt``
+
+          ``````text
+          $checksums
+          ``````
+
+          ---
+          Forked from [yapfast/yapfast](https://github.com/yapfast/yapfast) (GPL-3.0-or-later).
+          "@ | Set-Content -Path release-notes.md -Encoding utf8
+
+          gh release view "$env:TAG" 2>$null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload "$env:TAG" "$setup" "$zip" "$sums" --clobber
+            gh release edit "$env:TAG" --title "Discy $env:TAG" --notes-file release-notes.md --prerelease=false --latest
+          } else {
+            gh release create "$env:TAG" "$setup" "$zip" "$sums" `
+              --target "$env:COMMIT" `
+              --title "Discy $env:TAG" `
+              --notes-file release-notes.md `
+              --latest
+          }
